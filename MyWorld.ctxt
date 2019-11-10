@@ -2,4 +2,10 @@
 comment0.target=MyWorld
 comment1.params=
 comment1.target=MyWorld()
-numComments=2
+comment2.params=i\ j
+comment2.target=void\ drawVerticalRoad(int,\ int)
+comment3.params=i\ j
+comment3.target=void\ drawHorizontalRoad(int,\ int)
+comment4.params=i\ j
+comment4.target=void\ drawBuilding(int,\ int)
+numComments=5
