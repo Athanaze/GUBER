@@ -1,0 +1,5 @@
+#BlueJ class context
+comment0.target=Position
+comment1.params=argX\ argY
+comment1.target=Position(int,\ int)
+numComments=2
