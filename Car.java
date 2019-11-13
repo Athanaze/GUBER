@@ -5,25 +5,45 @@ import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
  */
 public class Car extends Actor
 {
-    static final int CAR_TURN_RATE = 3;
+    static final int CAR_TURN_RIGHT = 9;
     static final int CAR_FORWARD_SPEED = 5;
+    int rotation = 1 ;
+    protected void addedToWorld(World MyWorld){
+        GreenfootImage image = getImage(); 
+        setImage(image);
+        image.rotate(-90);
+        image.scale(20, 30);
+        
+        
+        
+        
+        
+        
+        
+    }
     public void act() 
     {
         
-        // Make the car a correct size
-        GreenfootImage image = getImage();   
-        image.scale(30, 50);
-        setImage(image);
+       
+        
 
         // For now, autistic drifting moves
         if(Greenfoot.isKeyDown("left")){
-            turn(CAR_TURN_RATE);
+            rotation+= CAR_TURN_RIGHT;
+            setRotation(rotation);
+            
         }
         if(Greenfoot.isKeyDown("right")){
-            turn(-CAR_TURN_RATE);
+            rotation-= CAR_TURN_RIGHT;
+            setRotation(rotation);
         }
         if(Greenfoot.isKeyDown("up")){
            move(CAR_FORWARD_SPEED);
+        }
+        if (isTouching(OldLady.class) != false){
+            getWorld().removeObject(this);
+            
+            
         }
 
     }    

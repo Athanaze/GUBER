@@ -14,4 +14,6 @@ comment6.params=i\ j
 comment6.target=void\ drawHorizontalRoad(int,\ int)
 comment7.params=i\ j
 comment7.target=void\ drawBuilding(int,\ int)
-numComments=8
+comment8.params=i\ j
+comment8.target=void\ spawnCar(int,\ int)
+numComments=9

@@ -53,6 +53,7 @@ public class MyWorld extends World
                 }
             }
         }
+        spawnCar(WORLD_X / 2, WORLD_Y + 30);
     }
     
    public void act(){
@@ -133,4 +134,15 @@ public class MyWorld extends World
 
         image.fillRect(x, y, TILE_SIZE, TILE_SIZE);
     }
+    private void spawnCar(int i, int j){
+    int x = i;
+    int y = j;
+    
+    Car car = new Car();
+    
+    addObject(car, x, y);
+    
+    }
+
+
 }
