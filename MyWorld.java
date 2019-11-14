@@ -14,11 +14,14 @@ public class MyWorld extends World
     static final Color TILE_ROAD_COLOR = new Color(ROAD_BLACKNESS, ROAD_BLACKNESS, ROAD_BLACKNESS);
     static final Color TILE_GRASS_COLOR = new Color(10, 255, 0);
     static final Color TILE_BUILDING_COLOR = new Color(255, 204, 102);
-
+    static final Color TILE_CROSSING_COLOR = new Color(255, 255, 0);
     static final int N_TYPES = 3;
     // Must be divisible by 2
     static final int ROAD_TO_GRASS_RATIO = 4;
-
+    
+    static final int N_CROSSING_BANDS = 4;
+    static final int CROSSING_BANDS_WIDTH = TILE_SIZE / (N_CROSSING_BANDS * 2);
+    
     static final int TILE_TYPE_BUILDING = 0;
     static final int TILE_TYPE_VERTICAL = 1;
     static final int TILE_TYPE_HORIZONTAL = 2;
@@ -53,6 +56,16 @@ public class MyWorld extends World
                 }
             }
         }
+        
+        // Place some crossings on the roads
+        // For now, we just use some hard-coded positions
+        placeCrossing(2, 4);
+        placeCrossing(6, 8);
+        /* TODO :
+         *  - Spawn the car exactly on one tile -> the tile type become "car" or smth
+         *  - Move the car one tile at a time, and only on road :)
+         *  - Detect the collision with the old lady just by using the tiles array
+         */
         spawnCar(WORLD_X / 2, WORLD_Y + 30);
     }
     
@@ -63,12 +76,9 @@ public class MyWorld extends World
                 {
                     Position tilePosition = getTilePosition(mouse.getX(), mouse.getY());
                     
-                    // Check if the clicked tile is a passage pieton, so we can start spawning some Vieille
-                    // For now quick and dirty => just vertical roads
-                    if(tiles[tilePosition.x][tilePosition.y] == TILE_TYPE_VERTICAL){
-                        System.out.println("VERTICAL ROAD");
+                    // Check if the clicked tile is a crossing, and spawn an old lady if this is the case
+                    if(tiles[tilePosition.x][tilePosition.y] == TILE_TYPE_CROSSING){
                         tiles[tilePosition.x][tilePosition.y] = TILE_TYPE_OLD_LADY;
-                        
                         addObject(new OldLady(),tilePosition.x*TILE_SIZE, tilePosition.y*TILE_SIZE);
                     }
                     
@@ -134,14 +144,41 @@ public class MyWorld extends World
 
         image.fillRect(x, y, TILE_SIZE, TILE_SIZE);
     }
+    
+    private void drawCrossing(int i, int j){
+        int x = i*TILE_SIZE;
+        int y = j*TILE_SIZE;
+
+        GreenfootImage image = getBackground();
+
+        image.setColor(TILE_ROAD_COLOR);
+
+        image.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+        
+        // Add bands on top
+        image.setColor(TILE_CROSSING_COLOR);
+        boolean crossing_b = true;
+        for(int p = 0; p < TILE_SIZE; p+=CROSSING_BANDS_WIDTH){
+            if(crossing_b){
+                 image.fillRect(x, y+p, TILE_SIZE, CROSSING_BANDS_WIDTH);
+                 crossing_b = false;
+            }
+            else{
+                crossing_b = true;
+            }
+        }
+        
+    }
+    
+    private void placeCrossing(int i, int j){
+        tiles[i][j] = TILE_TYPE_CROSSING;
+        drawCrossing(i, j);
+    }
+    
+    
     private void spawnCar(int i, int j){
-    int x = i;
-    int y = j;
-    
-    Car car = new Car();
-    
-    addObject(car, x, y);
-    
+        Car car = new Car();
+        addObject(car, i, j);
     }
 
 
