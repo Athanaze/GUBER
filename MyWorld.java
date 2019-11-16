@@ -7,7 +7,7 @@ public class MyWorld extends World
     static final int WORLD_S = 1;
 
     static final int N_TILE = 10;
-    static final int TILE_SIZE = WORLD_X / N_TILE;
+    public static final int TILE_SIZE = WORLD_X / N_TILE;
 
     static final int ROAD_BLACKNESS = 128;
 
@@ -27,15 +27,24 @@ public class MyWorld extends World
     static final int TILE_TYPE_HORIZONTAL = 2;
     static final int TILE_TYPE_CROSSING = 3;
     static final int TILE_TYPE_OLD_LADY = 4;
+    static final int TILE_TYPE_CAR = 5;
+    
+    static final boolean GAME_OVER_BOLD = true;
+    static final boolean GAME_OVER_ITALIC = false;
+    static final int GAME_OVER_FONT_SIZE = TILE_SIZE;
+    static final String GAME_OVER_STRING = "GAME OVER \n PLAYER 2 WON !";
+    static final Color GAME_OVER_FOREGROUND = new Color(255, 255, 255);
+    static final Color GAME_OVER_BACKGROUND = new Color(0, 0, 0);
+    static final Color GAME_OVER_OUTLINE = new Color(255, 0, 0);
     
     boolean gameOver = false;
     int[][] tiles = new int[N_TILE][N_TILE];
+    Car car;
+
     public MyWorld()
     {    
         // Create a new world with X by Y cells with a cell size of S pixels.
         super(WORLD_X, WORLD_Y, WORLD_S); 
-
-
         for(int j = 0; j < N_TILE; j++){
 
             for(int i = 0; i < N_TILE; i++){
@@ -62,14 +71,42 @@ public class MyWorld extends World
         placeCrossing(2, 4);
         placeCrossing(6, 8);
         /* TODO :
-         *  - Spawn the car exactly on one tile -> the tile type become "car" or smth
-         *  - Move the car one tile at a time, and only on road :)
-         *  - Detect the collision with the old lady just by using the tiles array
+         *  - Use an interface so we dont duplicate all the constants
+         *  - Detect the collision with the old lady just by using the tiles array 
          */
-        spawnCar(WORLD_X / 2, WORLD_Y + 30);
+        car = new Car();
+
+        /*
+         * 2nd and third arguments here really do not matter
+         * We could do : addObject(car, 87, 74); and it would work just fine.
+         * Here we put 0, 0 so it's "nice" when the game is not yet running.
+        
+        */
+        addObject(car, 0, 0);
     }
     
    public void act(){
+       // Player 1
+       Position carPosition = car.getPosition();
+
+       // Check if the car position is valid, if it's not, game over => player 2 win the game
+       switch(tiles[carPosition.x][carPosition.y]){
+           case TILE_TYPE_VERTICAL:
+            break;
+           
+           case TILE_TYPE_HORIZONTAL:
+            break;
+            
+           case TILE_TYPE_CROSSING:
+            gameOver = true;
+            break;
+            
+           case TILE_TYPE_BUILDING:
+            gameOver = true;
+            break;
+       }
+       
+        // Player 2
          MouseInfo mouse = Greenfoot.getMouseInfo();
             if(mouse!=null){  
                 if(mouse.getButton() == 1 && Greenfoot.mouseClicked(null)) 
@@ -84,9 +121,12 @@ public class MyWorld extends World
                     
                 }
             }
-            if(Greenfoot.isKeyDown("q")){
-                gameOver = true;
-            }
+      
+       if(gameOver){
+           System.out.println("Game over");
+           removeObject(car);
+           drawGameOver();
+       }
     }
     
     // Returns the tile position in the global array from the x and y pixel coordinates
@@ -101,6 +141,27 @@ public class MyWorld extends World
         }else{
             return (v / TILE_SIZE) - 1;
         }
+    }
+    
+    // Stuff being drawn on the screen
+    
+    private void drawGameOver(){
+        GreenfootImage image = getBackground();
+        
+        // First, fill the entire screen with a rectangle
+        image.setColor(GAME_OVER_BACKGROUND);
+        image.fillRect(0, 0, WORLD_X, WORLD_Y);
+        
+        GreenfootImage g = new GreenfootImage(
+            GAME_OVER_STRING,
+            GAME_OVER_FONT_SIZE,
+            GAME_OVER_FOREGROUND,
+            GAME_OVER_BACKGROUND,
+            GAME_OVER_OUTLINE
+        );
+        
+        // Draw the text at the center of the screen
+        image.drawImage(g, (WORLD_X - g.getWidth()) / 2, (WORLD_Y - g.getHeight()) / 2);
     }
     
     private void drawVerticalRoad(int i, int j){
@@ -170,16 +231,23 @@ public class MyWorld extends World
         
     }
     
+    private void drawCar(int i, int j){
+        int x = i*TILE_SIZE;
+        int y = j*TILE_SIZE;
+        tiles[i][j] = TILE_TYPE_CAR;
+        GreenfootImage image = getBackground();
+        GreenfootImage sprite = new GreenfootImage("car.png");
+        sprite.scale(TILE_SIZE, TILE_SIZE);
+        image.drawImage(sprite, x, y);
+        
+    }
+    
     private void placeCrossing(int i, int j){
+        int x = i*TILE_SIZE;
+        int y = j*TILE_SIZE;
+        
         tiles[i][j] = TILE_TYPE_CROSSING;
         drawCrossing(i, j);
     }
-    
-    
-    private void spawnCar(int i, int j){
-        Car car = new Car();
-        addObject(car, i, j);
-    }
-
 
 }
