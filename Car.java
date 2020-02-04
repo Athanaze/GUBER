@@ -32,10 +32,10 @@ public class Car extends Actor{
     static final int TILE_TYPE_OLD_LADY = 4;
     static final int TILE_TYPE_CAR = 5;
 
-    static final int CAR_LEFT_ROTATION = 0;
-    static final int CAR_RIGHT_ROTATION = 180;
-    static final int CAR_DOWN_ROTATION = -90;
-    static final int CAR_UP_ROTATION = 90;
+    static final int CAR_LEFT_ROTATION = 180;
+    static final int CAR_RIGHT_ROTATION = 0;
+    static final int CAR_DOWN_ROTATION = 90;
+    static final int CAR_UP_ROTATION = -90;
 
     protected void addedToWorld(World world){
 

@@ -21,6 +21,7 @@ public class MyWorld extends World
     
     static final int N_CROSSING_BANDS = 4;
     static final int CROSSING_BANDS_WIDTH = TILE_SIZE / (N_CROSSING_BANDS * 2);
+    static final int NB_BUILDINGS = 5;
     
     static final int TILE_TYPE_BUILDING = 0;
     static final int TILE_TYPE_VERTICAL = 1;
@@ -28,6 +29,11 @@ public class MyWorld extends World
     static final int TILE_TYPE_CROSSING = 3;
     static final int TILE_TYPE_OLD_LADY = 4;
     static final int TILE_TYPE_CAR = 5;
+    static final int TILE_TYPE_GRASS = 6;
+    
+    private Actor clock = new Actor(){};
+    private int clockTime = 50;
+    private int clockRegulator;
     
     static final boolean GAME_OVER_BOLD = true;
     static final boolean GAME_OVER_ITALIC = false;
@@ -44,7 +50,10 @@ public class MyWorld extends World
     public MyWorld()
     {    
         // Create a new world with X by Y cells with a cell size of S pixels.
-        super(WORLD_X, WORLD_Y, WORLD_S); 
+        super(WORLD_X, WORLD_Y, WORLD_S);
+        clock.setImage(new GreenfootImage("Time: "+clockTime, 20, greenfoot.Color.BLACK, null));;
+        addObject(clock, 75, 40);
+        
         for(int j = 0; j < N_TILE; j++){
 
             for(int i = 0; i < N_TILE; i++){
@@ -59,17 +68,18 @@ public class MyWorld extends World
                     drawHorizontalRoad(i, j);
                     }
                     else{
-                        tiles[i][j] = TILE_TYPE_BUILDING;
-                        drawBuilding(i,j);
+                        tiles[i][j] = TILE_TYPE_GRASS;
+                        drawGrass(i,j);
                     }
                 }
             }
         }
-        
+        PlaceBuilding(NB_BUILDINGS);
         // Place some crossings on the roads
         // For now, we just use some hard-coded positions
         placeCrossing(2, 4);
         placeCrossing(6, 8);
+        
         /* TODO :
          *  - Use an interface so we dont duplicate all the constants
          *  - Detect the collision with the old lady just by using the tiles array 
@@ -88,7 +98,7 @@ public class MyWorld extends World
    public void act(){
        // Player 1
        Position carPosition = car.getPosition();
-
+       
        // Check if the car position is valid, if it's not, game over => player 2 win the game
        switch(tiles[carPosition.x][carPosition.y]){
            case TILE_TYPE_VERTICAL:
@@ -98,10 +108,12 @@ public class MyWorld extends World
             break;
             
            case TILE_TYPE_CROSSING:
-            gameOver = true;
+            gameOver = false;
             break;
             
            case TILE_TYPE_BUILDING:
+            gameOver = true;
+           case TILE_TYPE_OLD_LADY:
             gameOver = true;
             break;
        }
@@ -121,19 +133,22 @@ public class MyWorld extends World
                     
                 }
             }
-      
+       //update clock    
+       runClock();
+       
        if(gameOver){
            System.out.println("Game over");
            removeObject(car);
            drawGameOver();
        }
+       
     }
     
     // Returns the tile position in the global array from the x and y pixel coordinates
     private Position getTilePosition(int x, int y){
         return new Position(getOneTilePosition(x), getOneTilePosition(y));
     }
-    
+   
     // Used in getTilePosition
     private int getOneTilePosition(int v){
         if((v % TILE_SIZE) != 0){
@@ -142,7 +157,23 @@ public class MyWorld extends World
             return (v / TILE_SIZE) - 1;
         }
     }
-    
+     //used upon world construction
+    private void PlaceBuilding(int nb){
+        int n = nb;
+        
+        while(n >0){
+        int x = Greenfoot.getRandomNumber(WORLD_X);
+        int y = Greenfoot.getRandomNumber(WORLD_Y);
+        Position tilePosition = getTilePosition(x,y);
+        // TILE_GRASS does not exist, so i must use ||
+        if((tiles[tilePosition.x][tilePosition.y] == TILE_TYPE_GRASS))
+        { tiles[tilePosition.x][tilePosition.y] = TILE_TYPE_BUILDING;
+        drawBuilding(tilePosition.x, tilePosition.y);
+        n--;};
+        }
+        
+        
+    }
     // Stuff being drawn on the screen
     
     private void drawGameOver(){
@@ -206,6 +237,18 @@ public class MyWorld extends World
         image.fillRect(x, y, TILE_SIZE, TILE_SIZE);
     }
     
+    private void drawGrass(int i, int j){
+        int x = i*TILE_SIZE;
+        int y = j*TILE_SIZE;
+
+        GreenfootImage image = getBackground();
+
+        image.setColor(TILE_GRASS_COLOR);
+
+        image.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+    }
+    
+    
     private void drawCrossing(int i, int j){
         int x = i*TILE_SIZE;
         int y = j*TILE_SIZE;
@@ -249,5 +292,14 @@ public class MyWorld extends World
         tiles[i][j] = TILE_TYPE_CROSSING;
         drawCrossing(i, j);
     }
-
+    private void runClock(){
+        
+            clockRegulator = (clockRegulator+1)%70;
+            if (clockRegulator == 0)
+                {
+                    clockTime--;
+                    clock.setImage(new GreenfootImage("Time: "+clockTime, 20, greenfoot.Color.BLACK, null));
+                    if(clockTime == 0){gameOver = true;}
+                }
+    }
 }
