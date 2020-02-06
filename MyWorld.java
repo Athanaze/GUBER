@@ -51,7 +51,7 @@ public class MyWorld extends World
     {    
         // Create a new world with X by Y cells with a cell size of S pixels.
         super(WORLD_X, WORLD_Y, WORLD_S);
-        clock.setImage(new GreenfootImage("Time: "+clockTime, 20, greenfoot.Color.BLACK, null));;
+        clock.setImage(new GreenfootImage("Time: "+clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));;
         addObject(clock, 75, 40);
         
         for(int j = 0; j < N_TILE; j++){
@@ -74,7 +74,7 @@ public class MyWorld extends World
                 }
             }
         }
-        PlaceBuilding(NB_BUILDINGS);
+        placeBuildings(NB_BUILDINGS);
         // Place some crossings on the roads
         // For now, we just use some hard-coded positions
         placeCrossing(2, 4);
@@ -158,18 +158,18 @@ public class MyWorld extends World
         }
     }
      //used upon world construction
-    private void PlaceBuilding(int nb){
-        int n = nb;
-        
+    private void placeBuildings(int n){
+
         while(n >0){
-        int x = Greenfoot.getRandomNumber(WORLD_X);
-        int y = Greenfoot.getRandomNumber(WORLD_Y);
-        Position tilePosition = getTilePosition(x,y);
-        // TILE_GRASS does not exist, so i must use ||
-        if((tiles[tilePosition.x][tilePosition.y] == TILE_TYPE_GRASS))
-        { tiles[tilePosition.x][tilePosition.y] = TILE_TYPE_BUILDING;
-        drawBuilding(tilePosition.x, tilePosition.y);
-        n--;};
+            int x = Greenfoot.getRandomNumber(N_TILE-1);
+            int y = Greenfoot.getRandomNumber(N_TILE-1);
+            
+            // TILE_GRASS does not exist, so i must use ||
+            if((tiles[x][y] == TILE_TYPE_GRASS)){
+                tiles[x][y] = TILE_TYPE_BUILDING;
+                drawBuilding(x, y);
+                n--;
+            };
         }
         
         
@@ -298,7 +298,7 @@ public class MyWorld extends World
             if (clockRegulator == 0)
                 {
                     clockTime--;
-                    clock.setImage(new GreenfootImage("Time: "+clockTime, 20, greenfoot.Color.BLACK, null));
+                    clock.setImage(new GreenfootImage("Time: "+clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
                     if(clockTime == 0){gameOver = true;}
                 }
     }
