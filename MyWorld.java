@@ -15,6 +15,7 @@ public class MyWorld extends World
     static final Color TILE_GRASS_COLOR = new Color(10, 255, 0);
     static final Color TILE_BUILDING_COLOR = new Color(255, 204, 102);
     static final Color TILE_CROSSING_COLOR = new Color(255, 255, 0);
+    static final Color TILE_CLIENT_COLOR = new Color(0,0,0);
     static final int N_TYPES = 3;
     // Must be divisible by 2
     static final int ROAD_TO_GRASS_RATIO = 4;
@@ -30,6 +31,8 @@ public class MyWorld extends World
     static final int TILE_TYPE_OLD_LADY = 4;
     static final int TILE_TYPE_CAR = 5;
     static final int TILE_TYPE_GRASS = 6;
+    static final int TILE_TYPE_INTERSECTION = 7;
+    static final int TILE_TYPE_CLIENT = 8;
     
     private Actor clock = new Actor(){};
     private int clockTime = 50;
@@ -57,8 +60,11 @@ public class MyWorld extends World
         for(int j = 0; j < N_TILE; j++){
 
             for(int i = 0; i < N_TILE; i++){
-
-                if((i % 4) == 0){
+                if ((i % 4) == 0 && (j % 4 )== 0){
+                    tiles[i][j] = TILE_TYPE_INTERSECTION;
+                    drawIntersection(i,j);
+                }
+                else {if((i % 4) == 0){
                     tiles[i][j] = TILE_TYPE_VERTICAL;
                     drawVerticalRoad(i,j);
 
@@ -71,14 +77,17 @@ public class MyWorld extends World
                         tiles[i][j] = TILE_TYPE_GRASS;
                         drawGrass(i,j);
                     }
-                }
+                }}
+                
             }
+            
         }
         placeBuildings(NB_BUILDINGS);
         // Place some crossings on the roads
         // For now, we just use some hard-coded positions
         placeCrossing(2, 4);
         placeCrossing(6, 8);
+        placeClient();
         
         /* TODO :
          *  - Use an interface so we dont duplicate all the constants
@@ -107,12 +116,19 @@ public class MyWorld extends World
            case TILE_TYPE_HORIZONTAL:
             break;
             
+           case TILE_TYPE_INTERSECTION:
+            break;
+            
            case TILE_TYPE_CROSSING:
             gameOver = false;
             break;
             
            case TILE_TYPE_BUILDING:
             gameOver = true;
+            
+           case TILE_TYPE_GRASS:
+            gameOver = true;
+            
            case TILE_TYPE_OLD_LADY:
             gameOver = true;
             break;
@@ -164,7 +180,7 @@ public class MyWorld extends World
             int x = Greenfoot.getRandomNumber(N_TILE-1);
             int y = Greenfoot.getRandomNumber(N_TILE-1);
             
-            // TILE_GRASS does not exist, so i must use ||
+            
             if((tiles[x][y] == TILE_TYPE_GRASS)){
                 tiles[x][y] = TILE_TYPE_BUILDING;
                 drawBuilding(x, y);
@@ -209,6 +225,7 @@ public class MyWorld extends World
 
         image.fillRect(x+(TILE_SIZE/ROAD_TO_GRASS_RATIO), y, TILE_SIZE/(ROAD_TO_GRASS_RATIO/ 2), TILE_SIZE);
     }
+    
 
     private void drawHorizontalRoad(int i, int j){
         int x = i*TILE_SIZE;
@@ -225,7 +242,24 @@ public class MyWorld extends World
 
         image.fillRect(x, y+(TILE_SIZE/ROAD_TO_GRASS_RATIO), TILE_SIZE, TILE_SIZE/(ROAD_TO_GRASS_RATIO/2));
     }
+    
+    private void drawIntersection(int i, int j){
+        int x = i*TILE_SIZE;
+        int y = j*TILE_SIZE;
+        
+        GreenfootImage image = getBackground();
+        
+        image.setColor(TILE_GRASS_COLOR);
 
+        image.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+        
+        image.setColor(TILE_ROAD_COLOR);
+        
+        // Draw the road on top of the grass
+        image.fillRect(x, y+(TILE_SIZE/ROAD_TO_GRASS_RATIO), TILE_SIZE, TILE_SIZE/(ROAD_TO_GRASS_RATIO/2));
+        image.fillRect(x+(TILE_SIZE/ROAD_TO_GRASS_RATIO), y, TILE_SIZE/(ROAD_TO_GRASS_RATIO/ 2), TILE_SIZE);
+    }
+    
     private void drawBuilding(int i, int j){
         int x = i*TILE_SIZE;
         int y = j*TILE_SIZE;
@@ -235,6 +269,20 @@ public class MyWorld extends World
         image.setColor(TILE_BUILDING_COLOR);
 
         image.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+    }
+    //gotta improve this hun
+    private void drawClient(int i, int j){
+        int x = i*TILE_SIZE;
+        int y = j*TILE_SIZE;
+
+        GreenfootImage image = getBackground();
+
+        image.setColor(TILE_CLIENT_COLOR);
+
+        image.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+        
+        
+        
     }
     
     private void drawGrass(int i, int j){
@@ -292,6 +340,20 @@ public class MyWorld extends World
         tiles[i][j] = TILE_TYPE_CROSSING;
         drawCrossing(i, j);
     }
+    // place a client in a random building
+    private void placeClient(){
+            while(true){ 
+             int x = Greenfoot.getRandomNumber(N_TILE-1);
+             int y = Greenfoot.getRandomNumber(N_TILE-1);
+             if(tiles[x][y] == TILE_TYPE_BUILDING){
+                 tiles[x][y] = TILE_TYPE_CLIENT;
+                 drawClient(x,y);
+                 break;
+                }
+           
+        }
+    }
+    
     private void runClock(){
         
             clockRegulator = (clockRegulator+1)%70;
