@@ -16,7 +16,11 @@
 # Fonctionnement du jeu
 
 + Les routes sont générées procéduralement.
-+ Les points de dépose des passagers sont déterminés au début de la partie.
+## Gestion des clients et de leurs destinations
++ 4 clients total, une couleur par client (rouge : 0, bleu : 1, vert : 2, rose : 3)
++ Chaque destination est colorée de la couleur du client correspondant.
++ Les destinations des passagers sont déterminés au début de la partie.
+
 + Passages piétons sont générés procéduralement.
 
 # Contrôles

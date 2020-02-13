@@ -1,0 +1,9 @@
+#BlueJ class context
+comment0.target=Client
+comment1.params=
+comment1.target=void\ act()
+comment2.params=
+comment2.target=void\ getInTheCar()
+comment3.params=tileX\ tileY
+comment3.target=void\ dropOff(int,\ int)
+numComments=4

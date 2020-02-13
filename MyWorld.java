@@ -2,11 +2,11 @@ import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
 
 public class MyWorld extends World
 {
-    static final int WORLD_X = 320;
-    static final int WORLD_Y = 320;
+    static final int WORLD_X = 800;
+    static final int WORLD_Y = 800;
     static final int WORLD_S = 1;
 
-    static final int N_TILE = 10;
+    static final int N_TILE = 40;
     public static final int TILE_SIZE = WORLD_X / N_TILE;
 
     static final int ROAD_BLACKNESS = 128;
@@ -22,7 +22,7 @@ public class MyWorld extends World
     
     static final int N_CROSSING_BANDS = 4;
     static final int CROSSING_BANDS_WIDTH = TILE_SIZE / (N_CROSSING_BANDS * 2);
-    static final int NB_BUILDINGS = 5;
+    static final int NB_BUILDINGS = 10;
     
     static final int TILE_TYPE_BUILDING = 0;
     static final int TILE_TYPE_VERTICAL = 1;
@@ -49,6 +49,14 @@ public class MyWorld extends World
     boolean gameOver = false;
     int[][] tiles = new int[N_TILE][N_TILE];
     Car car;
+
+    // Clients
+    static final int N_CLIENTS = 4;
+    Client clients[] = new Client[N_CLIENTS];
+    // Red, Green, Blue, Pink
+    static final Color[] CLIENTS_COLORS = {new Color(255, 0, 0), new Color(0, 255, 0), new Color(0, 0, 255), new Color(255, 0, 255)};
+    int droppedOffClients = 0; // When it is == to N_CLIENTS, player 1 wins the game.
+    
 
     public MyWorld()
     {    
@@ -87,7 +95,7 @@ public class MyWorld extends World
         // For now, we just use some hard-coded positions
         placeCrossing(2, 4);
         placeCrossing(6, 8);
-        placeClient();
+        //placeClient();
         
         /* TODO :
          *  - Use an interface so we dont duplicate all the constants
@@ -108,12 +116,26 @@ public class MyWorld extends World
        // Player 1
        Position carPosition = car.getPosition();
        
+       boolean isCarNextToClient = false;
+       
        // Check if the car position is valid, if it's not, game over => player 2 win the game
        switch(tiles[carPosition.x][carPosition.y]){
            case TILE_TYPE_VERTICAL:
+            try{if(tiles[carPosition.x+1][carPosition.y] == TILE_TYPE_CLIENT || tiles[carPosition.x-1][carPosition.y] == TILE_TYPE_CLIENT){
+                isCarNextToClient = true;
+            }
+            }
+            // Just here to catch "out of bound" exeptions
+            catch(Exception e){}
             break;
            
            case TILE_TYPE_HORIZONTAL:
+               try{
+                   if(tiles[carPosition.x][carPosition.y+1] == TILE_TYPE_CLIENT || tiles[carPosition.x][carPosition.y-1] == TILE_TYPE_CLIENT){
+                    isCarNextToClient = true;
+                }
+               }
+               catch(Exception e){}
             break;
             
            case TILE_TYPE_INTERSECTION:
@@ -158,7 +180,13 @@ public class MyWorld extends World
            drawGameOver();
        }
        
+       if(isCarNextToClient){
+           System.out.println("Next to a client");
+       }
+       
     }
+    
+   
     
     // Returns the tile position in the global array from the x and y pixel coordinates
     private Position getTilePosition(int x, int y){
@@ -175,15 +203,24 @@ public class MyWorld extends World
     }
      //used upon world construction
     private void placeBuildings(int n){
-
+        int clientDestinationCounter = 0;
         while(n >0){
             int x = Greenfoot.getRandomNumber(N_TILE-1);
             int y = Greenfoot.getRandomNumber(N_TILE-1);
             
             
             if((tiles[x][y] == TILE_TYPE_GRASS)){
-                tiles[x][y] = TILE_TYPE_BUILDING;
-                drawBuilding(x, y);
+                // The first 4 buildings are set as destination
+                if(n < N_CLIENTS){
+                    tiles[x][y] = TILE_TYPE_CLIENT;
+                    
+                    drawDestination(x,y, n);
+                }
+                else{
+                    tiles[x][y] = TILE_TYPE_BUILDING;
+                    drawBuilding(x, y);
+                }
+                
                 n--;
             };
         }
@@ -270,19 +307,16 @@ public class MyWorld extends World
 
         image.fillRect(x, y, TILE_SIZE, TILE_SIZE);
     }
-    //gotta improve this hun
-    private void drawClient(int i, int j){
+
+    private void drawDestination(int i, int j, int colorIndex){
         int x = i*TILE_SIZE;
         int y = j*TILE_SIZE;
 
         GreenfootImage image = getBackground();
 
-        image.setColor(TILE_CLIENT_COLOR);
+        image.setColor(CLIENTS_COLORS[colorIndex]);
 
         image.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-        
-        
-        
     }
     
     private void drawGrass(int i, int j){
@@ -302,9 +336,7 @@ public class MyWorld extends World
         int y = j*TILE_SIZE;
 
         GreenfootImage image = getBackground();
-
         image.setColor(TILE_ROAD_COLOR);
-
         image.fillRect(x, y, TILE_SIZE, TILE_SIZE);
         
         // Add bands on top
@@ -340,28 +372,36 @@ public class MyWorld extends World
         tiles[i][j] = TILE_TYPE_CROSSING;
         drawCrossing(i, j);
     }
-    // place a client in a random building
-    private void placeClient(){
-            while(true){ 
+    
+    private void runClock(){
+        clockRegulator = (clockRegulator+1)%70;
+        if (clockRegulator == 0){
+            clockTime--;
+            clock.setImage(new GreenfootImage("Time: "+clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+            if(clockTime == 0){gameOver = true;}
+        }
+    }
+    
+    /*
+     * Spawn the 4 clients in an existing building, somewhere on the map
+     * Choose another building as the destination for each client
+     */
+    /*
+    private void setupClients(){
+        for(int i = 0; i <4; i++){
+            
+                        while(true){ 
              int x = Greenfoot.getRandomNumber(N_TILE-1);
              int y = Greenfoot.getRandomNumber(N_TILE-1);
              if(tiles[x][y] == TILE_TYPE_BUILDING){
                  tiles[x][y] = TILE_TYPE_CLIENT;
-                 drawClient(x,y);
+                  addObject(new Client(),x*TILE_SIZE, y*TILE_SIZE);
                  break;
                 }
            
         }
-    }
-    
-    private void runClock(){
-        
-            clockRegulator = (clockRegulator+1)%70;
-            if (clockRegulator == 0)
-                {
-                    clockTime--;
-                    clock.setImage(new GreenfootImage("Time: "+clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
-                    if(clockTime == 0){gameOver = true;}
-                }
-    }
+            
+            clients[i].setLocation(tileX*TILE_SIZE + (TILE_SIZE/2), tileY*TILE_SIZE + (TILE_SIZE/2));
+        }
+    }*/
 }
