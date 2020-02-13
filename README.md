@@ -1,3 +1,9 @@
+# TODO
+
++ Fancy animation when we drop off the client
++ Cartouches mémé (+ cooldown)
++ Make sure we place no buildings in the middle of the squares
++ Less autistic moves for the car
 
 # Gameplay
 

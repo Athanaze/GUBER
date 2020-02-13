@@ -41,7 +41,7 @@ public class Client extends Actor
         // For now, we just make him invisible right away
         
         GreenfootImage image = getImage();
-        image.scale(0, 0);
+        image.scale(1, 1);
         setImage(image);
     }
     
@@ -52,5 +52,9 @@ public class Client extends Actor
         setImage(image);
         
         setLocation(tileX*TILE_SIZE + (TILE_SIZE/2), tileY*TILE_SIZE + (TILE_SIZE/2));
+    }
+    
+    public void setColor(int colorIndex){
+        setImage("client"+Integer.toString(colorIndex)+".png");
     }
 }
