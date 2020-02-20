@@ -1,12 +1,12 @@
 import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
-
+import java.util.List;
 public class Client extends Actor
 {
-    static final int WORLD_X = 320;
-    static final int WORLD_Y = 320;
+    static final int WORLD_X = 800;
+    static final int WORLD_Y = 800;
     static final int WORLD_S = 1;
 
-    static final int N_TILE = 10;
+    static final int N_TILE = 40;
     public static final int TILE_SIZE = WORLD_X / N_TILE;
 
     static final int ROAD_BLACKNESS = 128;
@@ -29,20 +29,32 @@ public class Client extends Actor
     static final int TILE_TYPE_OLD_LADY = 4;
     static final int TILE_TYPE_CAR = 5;
     
+    
+    
+    
     public void act() 
     {
         GreenfootImage image = getImage();
         image.scale(TILE_SIZE, TILE_SIZE);
+        
+        int positionx = getX();
+        int positiony = getY();
         setImage(image);
     }
     
     public void getInTheCar(){
         // TODO : fancy animation
         // For now, we just make him invisible right away
+        /* attempt to get position of car to know the moving direction
+         * TODO : Make this work
+        List cars = getWorld().getObjects(Car.class);
+        int carx = cars.get(_index_);
+        */
         
+        if (isTouching(Car.class)){
         GreenfootImage image = getImage();
         image.scale(1, 1);
-        setImage(image);
+        setImage(image);}
     }
     
     // Called when the car is at the right destination

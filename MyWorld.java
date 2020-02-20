@@ -47,10 +47,17 @@ public class MyWorld extends World {
     static final int[] TILE_TYPE_CLIENT_DESTINATIONS = { TILE_TYPE_CLIENT_0_DESTINATION, TILE_TYPE_CLIENT_1_DESTINATION,
             TILE_TYPE_CLIENT_2_DESTINATION, TILE_TYPE_CLIENT_3_DESTINATION };
 
-    private Actor clock = new Actor() {
-    };
+    private Actor clock = new Actor() {};
     private int clockTime = 50;
     private int clockRegulator;
+    
+    private Actor clientScore = new Actor() {};
+    
+    static final int CLOCK_X = 75;
+    static final int CLOCK_Y = 40;
+    
+    static final int CLIENT_SCORE_X = 240;
+    static final int CLIENT_SCORE_Y = 40;
 
     static final boolean GAME_OVER_BOLD = true;
     static final boolean GAME_OVER_ITALIC = false;
@@ -68,18 +75,19 @@ public class MyWorld extends World {
     static final int N_CLIENTS = 4;
     Client clients[] = new Client[N_CLIENTS];
     // Red, Green, Blue, Pink
-    static final Color[] CLIENTS_COLORS = { new Color(255, 255, 255), new Color(0, 255, 0), new Color(0, 0, 255),
+    static final Color[] CLIENTS_COLORS = { new Color(255, 0, 0), new Color(0, 255, 0), new Color(0, 0, 255),
             new Color(255, 0, 255) };
     int droppedOffClients = 0; // When it is == to N_CLIENTS, player 1 wins the game.
     int clientInTheCar = -1; // -1 when there is nobody in the car, otherwise is equal to the number of the
-                             // client (0, 1, 2 or 3)
+    // client (0, 1, 2 or 3)
 
     public MyWorld() {
         // Create a new world with X by Y cells with a cell size of S pixels.
         super(WORLD_X, WORLD_Y, WORLD_S);
         clock.setImage(new GreenfootImage("Time: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
-
-        addObject(clock, 75, 40);
+        clientScore.setImage(new GreenfootImage("Client score: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+        addObject(clock, CLOCK_X, CLOCK_Y);
+        addObject(clientScore, CLIENT_SCORE_X, CLIENT_SCORE_Y);
 
         for (int j = 0; j < N_TILE; j++) {
 
@@ -113,9 +121,6 @@ public class MyWorld extends World {
         placeCrossing(6, 8);
         placeClients();
 
-        /*
-         * TODO : - Use an interface so we dont duplicate all the constants
-         */
         car = new Car();
 
         /*
@@ -124,7 +129,7 @@ public class MyWorld extends World {
          * "nice" when the game is not yet running.
          * 
          */
-        addObject(car, 0, 0);
+        addObject(car, TILE_SIZE, TILE_SIZE);
     }
 
     public void act() {
@@ -140,12 +145,13 @@ public class MyWorld extends World {
         // Check if the car position is valid, if it's not, game over => player 2 win
         // the game
         switch (tiles[carPosition.x][carPosition.y]) {
-        case TILE_TYPE_VERTICAL:
+            case TILE_TYPE_VERTICAL:
             // if there is noboy in the car, look if there is a client we could pick up
             if (clientInTheCar == -1) {
                 r = checkIfCarIsNextToClient(carPosition, true);
                 if (r != -1) {
                     carNextToClient = r;
+                    System.out.println(r);
                 }
             }
 
@@ -157,39 +163,42 @@ public class MyWorld extends World {
 
             break;
 
-        case TILE_TYPE_HORIZONTAL:
-            // if there is noboy in the car, look if there is a client we could pick up
-            if (clientInTheCar == -1) {
-                r = checkIfCarIsNextToClient(carPosition, false);
-                if (r != -1) {
-                    carNextToClient = r;
+            case TILE_TYPE_HORIZONTAL:
+                // if there is noboy in the car, look if there is a client we could pick up
+                if (clientInTheCar == -1) {
+                    r = checkIfCarIsNextToClient(carPosition, false);
+                    
+                    if (r != -1) {
+                        carNextToClient = r;
+                    }
                 }
-            }
-            
-            // If there is a client in the car, check if we can drop him off
-            else{
-                dropOffClient = checkToDropOffClient(carPosition, true, clientInTheCar);
+    
+                // If there is a client in the car, check if we can drop him off
+                else{
+                    dropOffClient = checkToDropOffClient(carPosition, false, clientInTheCar);
+    
+                }
 
-            }
+                break;
 
-            break;
+            case TILE_TYPE_INTERSECTION:
+                break;
 
-        case TILE_TYPE_INTERSECTION:
-            break;
+            case TILE_TYPE_CROSSING:
+                gameOver = false;
+                break;
 
-        case TILE_TYPE_CROSSING:
-            gameOver = false;
-            break;
+            case TILE_TYPE_BUILDING:
+                gameOver = true;
+                break;
 
-        case TILE_TYPE_BUILDING:
-            gameOver = true;
+            case TILE_TYPE_GRASS:
+                gameOver = true;
+                break;
 
-        case TILE_TYPE_GRASS:
-            gameOver = true;
-
-        case TILE_TYPE_OLD_LADY:
-            gameOver = true;
-            break;
+            case TILE_TYPE_OLD_LADY:
+                gameOver = true;
+                break;
         }
 
         // Player 2
@@ -207,13 +216,15 @@ public class MyWorld extends World {
 
             }
         }
-        // update clock
-        runClock();
+        
 
         if (gameOver) {
-            System.out.println("Game over");
             removeObject(car);
             drawGameOver();
+        }
+        else{
+            // update clock
+            runClock();
         }
 
         // If the car is next to a client, get the client in the car
@@ -230,6 +241,7 @@ public class MyWorld extends World {
             droppedOffClients++;
             clientInTheCar = -1;
         }
+        clientScore.setImage(new GreenfootImage("Client score: " + Integer.toString(droppedOffClients), 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
 
     }
     // When axis = true, we check on the x axis, otherwise on the y axis
@@ -241,51 +253,50 @@ public class MyWorld extends World {
             xValue = 1;
             yValue = 0;
         }
-        
+
         int r = -1;
         try {
             switch (tiles[carPosition.x + xValue][carPosition.y + yValue]) {
-            case TILE_TYPE_CLIENT_0:
+                case TILE_TYPE_CLIENT_0:
                 r = 0;
                 break;
-            case TILE_TYPE_CLIENT_1:
+                case TILE_TYPE_CLIENT_1:
                 r = 1;
                 break;
-            case TILE_TYPE_CLIENT_2:
+                case TILE_TYPE_CLIENT_2:
                 r = 2;
                 break;
-            case TILE_TYPE_CLIENT_3:
+                case TILE_TYPE_CLIENT_3:
                 r = 3;
                 break;
             }
         }
-        // Just here to catch "out of bound" exeptions
+        // Just here to catch "out of bound" exceptions
         catch (Exception e) {
         }
 
         try {
             switch (tiles[carPosition.x - xValue][carPosition.y - yValue]) {
-            case TILE_TYPE_CLIENT_0:
+                case TILE_TYPE_CLIENT_0:
                 r = 0;
                 break;
-            case TILE_TYPE_CLIENT_1:
+                case TILE_TYPE_CLIENT_1:
                 r = 1;
                 break;
-            case TILE_TYPE_CLIENT_2:
+                case TILE_TYPE_CLIENT_2:
                 r = 2;
                 break;
-            case TILE_TYPE_CLIENT_3:
+                case TILE_TYPE_CLIENT_3:
                 r = 3;
                 break;
             }
         }
-        // Just here to catch "out of bound" exeptions
+        // Just here to catch "out of bound" exceptions
         catch (Exception e) {
         }
-
+        showText("R : " + Integer.toString(r), 100,100);
         return r;
     }
-
 
     private boolean checkToDropOffClient(Position carPosition, boolean axis, int clientNumber){
         int xValue = 0;
@@ -295,14 +306,14 @@ public class MyWorld extends World {
             xValue = 1;
             yValue = 0;
         }
-        
+
         boolean r = false;
         try {
             if(tiles[carPosition.x + xValue][carPosition.y + yValue] == TILE_TYPE_CLIENT_DESTINATIONS[clientNumber]){
                 r = true;
             }
         }
-        // Just here to catch "out of bound" exeptions
+        // Just here to catch "out of bound" exceptions
         catch (Exception e) {
         }
 
@@ -311,7 +322,7 @@ public class MyWorld extends World {
                 r = true;
             }
         }
-        // Just here to catch "out of bound" exeptions
+        // Just here to catch "out of bound" exceptions
         catch (Exception e) {
         }
 
@@ -336,11 +347,12 @@ public class MyWorld extends World {
     // used upon world construction
     private void placeBuildings(int n) {
         int clientDestinationCounter = 0;
-        while (n > 0) {
+        while (n >= 0) {
             int x = Greenfoot.getRandomNumber(N_TILE - 1);
             int y = Greenfoot.getRandomNumber(N_TILE - 1);
 
-            if ((tiles[x][y] == TILE_TYPE_GRASS)) {
+            if ((tiles[x][y] == TILE_TYPE_GRASS) && (tiles[x-1][y] != TILE_TYPE_GRASS || tiles[x+1][y] != TILE_TYPE_GRASS) ){
+
                 // The first 4 buildings are set as destination
                 if (n < N_CLIENTS) {
                     tiles[x][y] = TILE_TYPE_CLIENT_DESTINATIONS[n];
@@ -504,6 +516,7 @@ public class MyWorld extends World {
             if (clockTime == 0) {
                 gameOver = true;
             }
+
         }
     }
 

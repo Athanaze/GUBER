@@ -45,6 +45,9 @@ public class Car extends Actor{
     static final int CAR_RIGHT_ROTATION = 0;
     static final int CAR_DOWN_ROTATION = 90;
     static final int CAR_UP_ROTATION = -90;
+    boolean move = false;
+    int timer = 0;
+    int delay = 0;
 
     protected void addedToWorld(World world){
 
@@ -55,43 +58,45 @@ public class Car extends Actor{
     }
     
     public void act(){
-       String k  = Greenfoot.getKey();
-       
-       if(k == null){
-        k  = "no_key"; // Just a placeholder so we dont get an null pointer exeption
-       }
-       
-       switch(k){
-           case "left":
-            setRotation(CAR_LEFT_ROTATION);
-            if(isInWorldBoundaries(x - 1)){
-                x--;
-            }
-            break;
-            
-           case "right":
-            setRotation(CAR_RIGHT_ROTATION);
-            if(isInWorldBoundaries(x + 1)){
-                x++;
-            }
-            break;
-            
-           case "up":
-            setRotation(CAR_UP_ROTATION);
-            if(isInWorldBoundaries(y - 1)){
-                y--;
-            }
-            break;
-            
-           case "down":
-            setRotation(CAR_DOWN_ROTATION);
-            if(isInWorldBoundaries(y + 1)){
-                y++;
-            }
-        }
+       //might be able to improve this with a switch
+       if(delay < timer){ move = true;}
         
+       if(isInWorldBoundaries(x - 1)){
+                if(Greenfoot.isKeyDown("left")){
+                setRotation(CAR_LEFT_ROTATION);
+                if(move == true){
+                x--; 
+                delay = timer+10;
+                move = false;
+                setLocation(x*TILE_SIZE + (TILE_SIZE/2), y*TILE_SIZE + (TILE_SIZE/2));}}
+            }
+       if(isInWorldBoundaries(x + 1)){
+            if(Greenfoot.isKeyDown("right")){
+            setRotation(CAR_RIGHT_ROTATION);
+            if(move == true){
+            x++;
+            delay = timer+10;
+            move = false;
+            setLocation(x*TILE_SIZE + (TILE_SIZE/2), y*TILE_SIZE + (TILE_SIZE/2));}}}   
+       if(isInWorldBoundaries(y - 1)){
+            if(Greenfoot.isKeyDown("up")){
+            setRotation(CAR_UP_ROTATION);
+            if(move == true){
+            y--;
+            delay = timer+10;
+            move = false;
+            setLocation(x*TILE_SIZE + (TILE_SIZE/2), y*TILE_SIZE + (TILE_SIZE/2));}}}
+       if(isInWorldBoundaries(y + 1)){
+            if(Greenfoot.isKeyDown("down")){
+            setRotation(CAR_DOWN_ROTATION);
+            if(move == true){
+            y++;
+            delay = timer+10;
+            move = false;
+            setLocation(x*TILE_SIZE + (TILE_SIZE/2), y*TILE_SIZE + (TILE_SIZE/2));}}}
+        timer++;
         // update visual location (we updated the "logic" location earlier in this method) 
-        setLocation(x*TILE_SIZE + (TILE_SIZE/2), y*TILE_SIZE + (TILE_SIZE/2));
+        
     }
     
     // Check if the car is the world's limit
