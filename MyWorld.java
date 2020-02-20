@@ -22,6 +22,7 @@ public class MyWorld extends World {
     static final int N_CROSSING_BANDS = 4;
     static final int CROSSING_BANDS_WIDTH = TILE_SIZE / (N_CROSSING_BANDS * 2);
     static final int NB_BUILDINGS = 10;
+    static final int NB_CROSSINGS = 10;
 
     static final int TILE_TYPE_BUILDING = 0;
     static final int TILE_TYPE_VERTICAL = 1;
@@ -117,8 +118,7 @@ public class MyWorld extends World {
         placeBuildings(NB_BUILDINGS);
         // Place some crossings on the roads
         // For now, we just use some hard-coded positions
-        placeCrossing(2, 4);
-        placeCrossing(6, 8);
+        placeCrossings(NB_CROSSINGS);
         placeClients();
 
         car = new Car();
@@ -345,6 +345,26 @@ public class MyWorld extends World {
     }
 
     // used upon world construction
+    private void placeCrossings(int n) {
+        while(n >= 0){
+            int x = Greenfoot.getRandomNumber(N_TILE -1);
+            int y = Greenfoot.getRandomNumber(N_TILE -1);
+            
+            if(tiles[x][y] == TILE_TYPE_VERTICAL  ){
+                tiles[x][y] = TILE_TYPE_CROSSING;
+                drawCrossing(x,y, true); 
+                n--;
+            }
+            else if(tiles[x][y] == TILE_TYPE_HORIZONTAL){
+                tiles[x][y] = TILE_TYPE_CROSSING;
+                drawCrossing(x, y, false);
+                n--;
+            
+            }
+            
+        }
+    }
+    
     private void placeBuildings(int n) {
         int clientDestinationCounter = 0;
         while (n >= 0) {
@@ -467,25 +487,34 @@ public class MyWorld extends World {
         image.fillRect(x, y, TILE_SIZE, TILE_SIZE);
     }
 
-    private void drawCrossing(int i, int j) {
+    private void drawCrossing(int i, int j, boolean vertical) {
         int x = i * TILE_SIZE;
         int y = j * TILE_SIZE;
 
         GreenfootImage image = getBackground();
         image.setColor(TILE_ROAD_COLOR);
-        image.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+        //image.fillRect(x, y, TILE_SIZE, TILE_SIZE);
 
         // Add bands on top
         image.setColor(TILE_CROSSING_COLOR);
+        if(vertical == false){
         boolean crossing_b = true;
         for (int p = 0; p < TILE_SIZE; p += CROSSING_BANDS_WIDTH) {
             if (crossing_b) {
-                image.fillRect(x, y + p, TILE_SIZE, CROSSING_BANDS_WIDTH);
+                image.fillRect(x, y + p, TILE_SIZE , CROSSING_BANDS_WIDTH);
                 crossing_b = false;
             } else {
                 crossing_b = true;
-            }
+            }}
         }
+        else{ boolean crossing_b = true;
+        for (int p = 0; p < TILE_SIZE; p += CROSSING_BANDS_WIDTH) {
+            if (crossing_b) {
+                image.fillRect(x+p, y, CROSSING_BANDS_WIDTH, TILE_SIZE);
+                crossing_b = false;
+            } else {
+                crossing_b = true;
+            }}}
 
     }
 
@@ -500,13 +529,7 @@ public class MyWorld extends World {
 
     }
 
-    private void placeCrossing(int i, int j) {
-        int x = i * TILE_SIZE;
-        int y = j * TILE_SIZE;
-
-        tiles[i][j] = TILE_TYPE_CROSSING;
-        drawCrossing(i, j);
-    }
+    
 
     private void runClock() {
         clockRegulator = (clockRegulator + 1) % 70;
