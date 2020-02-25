@@ -45,6 +45,7 @@ public class Car extends Actor{
     static final int CAR_RIGHT_ROTATION = 0;
     static final int CAR_DOWN_ROTATION = 90;
     static final int CAR_UP_ROTATION = -90;
+    boolean gameOver = false;
     boolean move = false;
     int timer = 0;
     int delay = 0;
@@ -63,8 +64,8 @@ public class Car extends Actor{
         
        if(isInWorldBoundaries(x - 1)){
                 if(Greenfoot.isKeyDown("left")){
-                setRotation(CAR_LEFT_ROTATION);
                 if(move == true){
+                setRotation(CAR_LEFT_ROTATION);
                 x--; 
                 delay = timer+10;
                 move = false;
@@ -72,24 +73,25 @@ public class Car extends Actor{
             }
        if(isInWorldBoundaries(x + 1)){
             if(Greenfoot.isKeyDown("right")){
-            setRotation(CAR_RIGHT_ROTATION);
+
             if(move == true){
+            setRotation(CAR_RIGHT_ROTATION);
             x++;
             delay = timer+10;
             move = false;
             setLocation(x*TILE_SIZE + (TILE_SIZE/2), y*TILE_SIZE + (TILE_SIZE/2));}}}   
        if(isInWorldBoundaries(y - 1)){
             if(Greenfoot.isKeyDown("up")){
-            setRotation(CAR_UP_ROTATION);
             if(move == true){
+            setRotation(CAR_UP_ROTATION);
             y--;
             delay = timer+10;
             move = false;
             setLocation(x*TILE_SIZE + (TILE_SIZE/2), y*TILE_SIZE + (TILE_SIZE/2));}}}
        if(isInWorldBoundaries(y + 1)){
             if(Greenfoot.isKeyDown("down")){
-            setRotation(CAR_DOWN_ROTATION);
             if(move == true){
+            setRotation(CAR_DOWN_ROTATION);
             y++;
             delay = timer+10;
             move = false;
@@ -97,6 +99,9 @@ public class Car extends Actor{
         timer++;
         // update visual location (we updated the "logic" location earlier in this method) 
         
+       if (isTouching(OldLady.class)){
+           gameOver = true;
+        }
     }
     
     // Check if the car is the world's limit

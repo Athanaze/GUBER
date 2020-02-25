@@ -28,10 +28,15 @@ public class OldLady extends Actor
     static final int TILE_TYPE_OLD_LADY = 4;
     static final int TILE_TYPE_CAR = 5;
     
+    //value still to be adjusted
+    static final int LIFE_DURATION = 300;
+    int timer = 0;
     public void act() 
-    {
+    {   timer++;
         GreenfootImage image = getImage();
         image.scale(TILE_SIZE, TILE_SIZE);
+        if(timer > LIFE_DURATION){image.clear();
+        getWorld().removeObject(this);}
         setImage(image);
     }    
 }

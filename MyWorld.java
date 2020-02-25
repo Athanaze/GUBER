@@ -28,6 +28,7 @@ public class MyWorld extends World {
     static final int TILE_TYPE_VERTICAL = 1;
     static final int TILE_TYPE_HORIZONTAL = 2;
     static final int TILE_TYPE_CROSSING = 3;
+    //TILE_TYPE_OLD_LADY no longer used! to remove
     static final int TILE_TYPE_OLD_LADY = 4;
     static final int TILE_TYPE_CAR = 5;
     static final int TILE_TYPE_GRASS = 6;
@@ -67,7 +68,11 @@ public class MyWorld extends World {
     static final Color GAME_OVER_FOREGROUND = new Color(255, 255, 255);
     static final Color GAME_OVER_BACKGROUND = new Color(0, 0, 0);
     static final Color GAME_OVER_OUTLINE = new Color(255, 0, 0);
-
+    //to adjust 
+    static final int LIFE_DURATION = 300;
+    boolean ladyAlive;
+    int ladyTimer = LIFE_DURATION;
+    
     boolean gameOver = false;
     int[][] tiles = new int[N_TILE][N_TILE];
     Car car;
@@ -144,6 +149,8 @@ public class MyWorld extends World {
 
         // Check if the car position is valid, if it's not, game over => player 2 win
         // the game
+        if(car.gameOver == true){
+        gameOver = true;}
         switch (tiles[carPosition.x][carPosition.y]) {
             case TILE_TYPE_VERTICAL:
             // if there is noboy in the car, look if there is a client we could pick up
@@ -204,20 +211,26 @@ public class MyWorld extends World {
         // Player 2
         MouseInfo mouse = Greenfoot.getMouseInfo();
         if (mouse != null) {
+            Position tilePosition = getTilePosition(mouse.getX(), mouse.getY());
             if (mouse.getButton() == 1 && Greenfoot.mouseClicked(null)) {
-                Position tilePosition = getTilePosition(mouse.getX(), mouse.getY());
+                
 
                 // Check if the clicked tile is a crossing, and spawn an old lady if this is the
                 // case
                 if (tiles[tilePosition.x][tilePosition.y] == TILE_TYPE_CROSSING) {
-                    tiles[tilePosition.x][tilePosition.y] = TILE_TYPE_OLD_LADY;
+                    
+                    boolean ladyAlive = true;
                     addObject(new OldLady(), tilePosition.x * TILE_SIZE, tilePosition.y * TILE_SIZE);
+                    
                 }
-
+                
+   
             }
-        }
+                
+            
+            }
         
-
+        
         if (gameOver) {
             removeObject(car);
             drawGameOver();
@@ -343,7 +356,7 @@ public class MyWorld extends World {
             return (v / TILE_SIZE) - 1;
         }
     }
-
+    
     // used upon world construction
     private void placeCrossings(int n) {
         while(n >= 0){
