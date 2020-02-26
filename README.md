@@ -1,10 +1,11 @@
 # TODO
 
 + Fancy animation when we drop off the client
-+ Cartouches mémé (+ cooldown)
-+ Make sure we place no buildings in the middle of the squares
-+ Less autistic moves for the car
-
++ Win screen for player 1
++ Improve timer mechanics
++ Start screen
++ Add animations for oldLadies?
++ Improve gameOver screen
 # Gameplay
 
 + Le joueur 1 conduit la voiture, et doit déposer ses covoiturés aux quatres points de la ville.
