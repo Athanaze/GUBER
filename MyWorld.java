@@ -54,13 +54,16 @@ public class MyWorld extends World {
     private int clockRegulator;
     
     private Actor clientScore = new Actor() {};
-    
+    private Actor player2_Ammo = new Actor() {};
     static final int CLOCK_X = 75;
     static final int CLOCK_Y = 40;
     
     static final int CLIENT_SCORE_X = 240;
     static final int CLIENT_SCORE_Y = 40;
 
+    static final int PLAYER2_AMMO_X = 370;
+    static final int PLAYER2_AMMO_Y = 40;
+    
     static final boolean GAME_OVER_BOLD = true;
     static final boolean GAME_OVER_ITALIC = false;
     static final int GAME_OVER_FONT_SIZE = TILE_SIZE;
@@ -68,11 +71,11 @@ public class MyWorld extends World {
     static final Color GAME_OVER_FOREGROUND = new Color(255, 255, 255);
     static final Color GAME_OVER_BACKGROUND = new Color(0, 0, 0);
     static final Color GAME_OVER_OUTLINE = new Color(255, 0, 0);
-    //to adjust 
-    static final int LIFE_DURATION = 300;
-    boolean ladyAlive;
-    int ladyTimer = LIFE_DURATION;
-    
+
+    static final int PLAYER2_MAX_AMMO = 5;
+    int player2Ammo = 5;
+    //should be the same as oldlady life duration
+    int player2Cooldown = OldLady.LIFE_DURATION;
     boolean gameOver = false;
     int[][] tiles = new int[N_TILE][N_TILE];
     Car car;
@@ -94,6 +97,8 @@ public class MyWorld extends World {
         clientScore.setImage(new GreenfootImage("Client score: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
         addObject(clock, CLOCK_X, CLOCK_Y);
         addObject(clientScore, CLIENT_SCORE_X, CLIENT_SCORE_Y);
+        player2_Ammo.setImage(new GreenfootImage("mémés: " + player2Ammo, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+        addObject(player2_Ammo, PLAYER2_AMMO_X, PLAYER2_AMMO_Y);
 
         for (int j = 0; j < N_TILE; j++) {
 
@@ -213,23 +218,28 @@ public class MyWorld extends World {
         if (mouse != null) {
             Position tilePosition = getTilePosition(mouse.getX(), mouse.getY());
             if (mouse.getButton() == 1 && Greenfoot.mouseClicked(null)) {
-                
-
+ 
                 // Check if the clicked tile is a crossing, and spawn an old lady if this is the
                 // case
                 if (tiles[tilePosition.x][tilePosition.y] == TILE_TYPE_CROSSING) {
                     
-                    boolean ladyAlive = true;
-                    addObject(new OldLady(), tilePosition.x * TILE_SIZE, tilePosition.y * TILE_SIZE);
-                    
+                    if(player2Ammo != 0){
+                        addObject(new OldLady(), tilePosition.x * TILE_SIZE, tilePosition.y * TILE_SIZE);
+                        player2Ammo--;
+                    }
                 }
-                
-   
+         
             }
-                
+
+            }
+        if(player2Ammo < PLAYER2_MAX_AMMO){    
+            if(player2Cooldown <1){
+                player2Ammo++;
+                player2Cooldown= OldLady.LIFE_DURATION;
             
             }
-        
+        }
+        player2Cooldown--;
         
         if (gameOver) {
             removeObject(car);
@@ -255,7 +265,7 @@ public class MyWorld extends World {
             clientInTheCar = -1;
         }
         clientScore.setImage(new GreenfootImage("Client score: " + Integer.toString(droppedOffClients), 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
-
+        player2_Ammo.setImage(new GreenfootImage("mémés: " + player2Ammo, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
     }
     // When axis = true, we check on the x axis, otherwise on the y axis
     private int checkIfCarIsNextToClient(Position carPosition, boolean axis) {
