@@ -28,33 +28,70 @@ public class Client extends Actor
     static final int TILE_TYPE_CROSSING = 3;
     static final int TILE_TYPE_OLD_LADY = 4;
     static final int TILE_TYPE_CAR = 5;
-    
-    
-    
+    boolean moveright = false;
+    boolean moveleft = false;
+    boolean moveup = false;
+    boolean movedown = false;
+
     
     public void act() 
     {
         GreenfootImage image = getImage();
         image.scale(TILE_SIZE, TILE_SIZE);
-        
+        List cars = getWorld().getObjects(Car.class);
         int positionx = getX();
         int positiony = getY();
-        setImage(image);
+        if(moveup == true){
+            if(!cars.isEmpty()){
+                Actor Car = (Actor)cars.get(0);
+                int cary = Car.getY();
+                if (this.getY() == cary){
+                        image.scale(1, 1);
+                        setImage(image);
+                        moveup = false;
+                    }
+            if(this.getY() - cary <0){      
+        setLocation(positionx, positiony+1);}
+        else{setLocation(positionx , positiony -1);}
+            
+        setImage(image);}
     }
+        if(moveright == true){
+            if(!cars.isEmpty()){
+                Actor Car = (Actor)cars.get(0);
+                int carx = Car.getX();
+                int cary = Car.getY();
+                if (this.getX() == carx){
+                        
+                        image.scale(1, 1);
+                        setImage(image);
+                        moveright = false;
+                    }
+            if(this.getX() - carx <0){      
+        setLocation(positionx + 1, positiony);}
+        else{setLocation(positionx -1, positiony);}
+            
+        setImage(image);}
+    }}
     
     public void getInTheCar(){
         // TODO : fancy animation
         // For now, we just make him invisible right away
-        /* attempt to get position of car to know the moving direction
-         * TODO : Make this work
         List cars = getWorld().getObjects(Car.class);
-        int carx = cars.get(_index_);
-        */
+        if (!cars.isEmpty())
+            {   Actor Car = (Actor)cars.get(0);
+                int carx = Car.getX();
+                int cary = Car.getY();
+                if(this.getX() - carx <0){
+                    moveright = true;
+                }
+                
+                if(this.getY() - cary <0){ moveup = true;
+                }
+                
+            }
         
-        if (isTouching(Car.class)){
-        GreenfootImage image = getImage();
-        image.scale(1, 1);
-        setImage(image);}
+        
     }
     
     // Called when the car is at the right destination
