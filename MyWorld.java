@@ -28,7 +28,6 @@ public class MyWorld extends World {
     static final int TILE_TYPE_VERTICAL = 1;
     static final int TILE_TYPE_HORIZONTAL = 2;
     static final int TILE_TYPE_CROSSING = 3;
-    //TILE_TYPE_OLD_LADY no longer used! to remove
     static final int TILE_TYPE_OLD_LADY = 4;
     static final int TILE_TYPE_CAR = 5;
     static final int TILE_TYPE_GRASS = 6;
@@ -49,21 +48,24 @@ public class MyWorld extends World {
     static final int[] TILE_TYPE_CLIENT_DESTINATIONS = { TILE_TYPE_CLIENT_0_DESTINATION, TILE_TYPE_CLIENT_1_DESTINATION,
             TILE_TYPE_CLIENT_2_DESTINATION, TILE_TYPE_CLIENT_3_DESTINATION };
 
-    private Actor clock = new Actor() {};
+    private Actor clock = new Actor() {
+    };
     private int clockTime = 50;
     private int clockRegulator;
-    
-    private Actor clientScore = new Actor() {};
-    private Actor player2_Ammo = new Actor() {};
+
+    private Actor clientScore = new Actor() {
+    };
+    private Actor player2_Ammo = new Actor() {
+    };
     static final int CLOCK_X = 75;
     static final int CLOCK_Y = 40;
-    
+
     static final int CLIENT_SCORE_X = 240;
     static final int CLIENT_SCORE_Y = 40;
 
     static final int PLAYER2_AMMO_X = 370;
     static final int PLAYER2_AMMO_Y = 40;
-    
+
     static final boolean GAME_OVER_BOLD = true;
     static final boolean GAME_OVER_ITALIC = false;
     static final int GAME_OVER_FONT_SIZE = TILE_SIZE;
@@ -74,7 +76,7 @@ public class MyWorld extends World {
 
     static final int PLAYER2_MAX_AMMO = 5;
     int player2Ammo = 5;
-    //should be the same as oldlady life duration
+    // should be the same as oldlady life duration
     int player2Cooldown = OldLady.LIFE_DURATION;
     boolean gameOver = false;
     int[][] tiles = new int[N_TILE][N_TILE];
@@ -94,10 +96,12 @@ public class MyWorld extends World {
         // Create a new world with X by Y cells with a cell size of S pixels.
         super(WORLD_X, WORLD_Y, WORLD_S);
         clock.setImage(new GreenfootImage("Time: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
-        clientScore.setImage(new GreenfootImage("Client score: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+        clientScore.setImage(
+                new GreenfootImage("Client score: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
         addObject(clock, CLOCK_X, CLOCK_Y);
         addObject(clientScore, CLIENT_SCORE_X, CLIENT_SCORE_Y);
-        player2_Ammo.setImage(new GreenfootImage("mémés: " + player2Ammo, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+        player2_Ammo.setImage(
+                new GreenfootImage("mémés: " + player2Ammo, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
         addObject(player2_Ammo, PLAYER2_AMMO_X, PLAYER2_AMMO_Y);
 
         for (int j = 0; j < N_TILE; j++) {
@@ -137,7 +141,6 @@ public class MyWorld extends World {
          * 2nd and third arguments here really do not matter We could do :
          * addObject(car, 87, 74); and it would work just fine. Here we put 0, 0 so it's
          * "nice" when the game is not yet running.
-         * 
          */
         addObject(car, TILE_SIZE, TILE_SIZE);
     }
@@ -154,41 +157,41 @@ public class MyWorld extends World {
 
         // Check if the car position is valid, if it's not, game over => player 2 win
         // the game
-        if(car.gameOver == true){
-        gameOver = true;}
+        gameOver = car.gameOver;
+
         switch (tiles[carPosition.x][carPosition.y]) {
             case TILE_TYPE_VERTICAL:
-            // if there is noboy in the car, look if there is a client we could pick up
-            if (clientInTheCar == -1) {
-                r = checkIfCarIsNextToClient(carPosition, true);
-                if (r != -1) {
-                    carNextToClient = r;
-                    System.out.println(r);
+                // if there is noboy in the car, look if there is a client we could pick up
+                if (clientInTheCar == -1) {
+                    r = checkIfCarIsNextToClient(carPosition, true);
+                    if (r != -1) {
+                        carNextToClient = r;
+                        System.out.println(r);
+                    }
                 }
-            }
 
-            // If there is a client in the car, check if we can drop him off
-            else{
-                dropOffClient = checkToDropOffClient(carPosition, true, clientInTheCar);
+                // If there is a client in the car, check if we can drop him off
+                else {
+                    dropOffClient = checkToDropOffClient(carPosition, true, clientInTheCar);
 
-            }
+                }
 
-            break;
+                break;
 
             case TILE_TYPE_HORIZONTAL:
                 // if there is noboy in the car, look if there is a client we could pick up
                 if (clientInTheCar == -1) {
                     r = checkIfCarIsNextToClient(carPosition, false);
-                    
+
                     if (r != -1) {
                         carNextToClient = r;
                     }
                 }
-    
+
                 // If there is a client in the car, check if we can drop him off
-                else{
+                else {
                     dropOffClient = checkToDropOffClient(carPosition, false, clientInTheCar);
-    
+
                 }
 
                 break;
@@ -218,34 +221,37 @@ public class MyWorld extends World {
         if (mouse != null) {
             Position tilePosition = getTilePosition(mouse.getX(), mouse.getY());
             if (mouse.getButton() == 1 && Greenfoot.mouseClicked(null)) {
- 
+
                 // Check if the clicked tile is a crossing, and spawn an old lady if this is the
                 // case
-                if (tiles[tilePosition.x][tilePosition.y] == TILE_TYPE_CROSSING) {
-                    
-                    if(player2Ammo != 0){
-                        addObject(new OldLady(), tilePosition.x * TILE_SIZE, tilePosition.y * TILE_SIZE);
+                if (tiles[tilePosition.x][tilePosition.y] == TILE_TYPE_CROSSING
+                        && tiles[tilePosition.x][tilePosition.y] != TILE_TYPE_OLD_LADY) {
+
+                    if (player2Ammo > 0) {
+                        Greenfoot.playSound("old_lady_spawned.wav");
+                        addObject(new OldLady(tilePosition), tilePosition.x * TILE_SIZE, tilePosition.y * TILE_SIZE);
                         player2Ammo--;
+                        tiles[tilePosition.x][tilePosition.y] = TILE_TYPE_OLD_LADY;
                     }
                 }
-         
-            }
 
             }
-        if(player2Ammo < PLAYER2_MAX_AMMO){    
-            if(player2Cooldown <1){
+
+        }
+        if (player2Ammo < PLAYER2_MAX_AMMO) {
+            if (player2Cooldown < 1) {
                 player2Ammo++;
-                player2Cooldown= OldLady.LIFE_DURATION;
-            
+                player2Cooldown = OldLady.LIFE_DURATION;
+
             }
         }
         player2Cooldown--;
-        
+
         if (gameOver) {
             removeObject(car);
             drawGameOver();
-        }
-        else{
+            Greenfoot.playSound("crash.wav");
+        } else {
             // update clock
             runClock();
         }
@@ -259,20 +265,26 @@ public class MyWorld extends World {
         }
 
         // If we dropped of a client, count it
-        if(dropOffClient){
+        if (dropOffClient) {
             clients[clientInTheCar].dropOff(carPosition.x, carPosition.y);
             droppedOffClients++;
             clientInTheCar = -1;
         }
-        clientScore.setImage(new GreenfootImage("Client score: " + Integer.toString(droppedOffClients), 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
-        player2_Ammo.setImage(new GreenfootImage("mémés: " + player2Ammo, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+        clientScore.setImage(new GreenfootImage("Client score: " + Integer.toString(droppedOffClients), 20,
+                greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+        player2_Ammo.setImage(
+                new GreenfootImage("mémés: " + player2Ammo, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+    }
+
+    public void setTileType(Position p, int tile_type){
+        tiles[p.x][p.y] = tile_type;
     }
     // When axis = true, we check on the x axis, otherwise on the y axis
     private int checkIfCarIsNextToClient(Position carPosition, boolean axis) {
         int xValue = 0;
         int yValue = 1;
 
-        if(axis){
+        if (axis) {
             xValue = 1;
             yValue = 0;
         }
@@ -281,17 +293,17 @@ public class MyWorld extends World {
         try {
             switch (tiles[carPosition.x + xValue][carPosition.y + yValue]) {
                 case TILE_TYPE_CLIENT_0:
-                r = 0;
-                break;
+                    r = 0;
+                    break;
                 case TILE_TYPE_CLIENT_1:
-                r = 1;
-                break;
+                    r = 1;
+                    break;
                 case TILE_TYPE_CLIENT_2:
-                r = 2;
-                break;
+                    r = 2;
+                    break;
                 case TILE_TYPE_CLIENT_3:
-                r = 3;
-                break;
+                    r = 3;
+                    break;
             }
         }
         // Just here to catch "out of bound" exceptions
@@ -301,38 +313,38 @@ public class MyWorld extends World {
         try {
             switch (tiles[carPosition.x - xValue][carPosition.y - yValue]) {
                 case TILE_TYPE_CLIENT_0:
-                r = 0;
-                break;
+                    r = 0;
+                    break;
                 case TILE_TYPE_CLIENT_1:
-                r = 1;
-                break;
+                    r = 1;
+                    break;
                 case TILE_TYPE_CLIENT_2:
-                r = 2;
-                break;
+                    r = 2;
+                    break;
                 case TILE_TYPE_CLIENT_3:
-                r = 3;
-                break;
+                    r = 3;
+                    break;
             }
         }
         // Just here to catch "out of bound" exceptions
         catch (Exception e) {
         }
-        showText("R : " + Integer.toString(r), 100,100);
+        showText("R : " + Integer.toString(r), 100, 100);
         return r;
     }
 
-    private boolean checkToDropOffClient(Position carPosition, boolean axis, int clientNumber){
+    private boolean checkToDropOffClient(Position carPosition, boolean axis, int clientNumber) {
         int xValue = 0;
         int yValue = 1;
 
-        if(axis){
+        if (axis) {
             xValue = 1;
             yValue = 0;
         }
 
         boolean r = false;
         try {
-            if(tiles[carPosition.x + xValue][carPosition.y + yValue] == TILE_TYPE_CLIENT_DESTINATIONS[clientNumber]){
+            if (tiles[carPosition.x + xValue][carPosition.y + yValue] == TILE_TYPE_CLIENT_DESTINATIONS[clientNumber]) {
                 r = true;
             }
         }
@@ -341,7 +353,7 @@ public class MyWorld extends World {
         }
 
         try {
-            if(tiles[carPosition.x - xValue][carPosition.y - yValue] == TILE_TYPE_CLIENT_DESTINATIONS[clientNumber]){
+            if (tiles[carPosition.x - xValue][carPosition.y - yValue] == TILE_TYPE_CLIENT_DESTINATIONS[clientNumber]) {
                 r = true;
             }
         }
@@ -366,35 +378,35 @@ public class MyWorld extends World {
             return (v / TILE_SIZE) - 1;
         }
     }
-    
+
     // used upon world construction
     private void placeCrossings(int n) {
-        while(n >= 0){
-            int x = Greenfoot.getRandomNumber(N_TILE -1);
-            int y = Greenfoot.getRandomNumber(N_TILE -1);
-            
-            if(tiles[x][y] == TILE_TYPE_VERTICAL  ){
+        while (n >= 0) {
+            int x = Greenfoot.getRandomNumber(N_TILE - 1);
+            int y = Greenfoot.getRandomNumber(N_TILE - 1);
+
+            if (tiles[x][y] == TILE_TYPE_VERTICAL) {
                 tiles[x][y] = TILE_TYPE_CROSSING;
-                drawCrossing(x,y, true); 
+                drawCrossing(x, y, true);
                 n--;
-            }
-            else if(tiles[x][y] == TILE_TYPE_HORIZONTAL){
+            } else if (tiles[x][y] == TILE_TYPE_HORIZONTAL) {
                 tiles[x][y] = TILE_TYPE_CROSSING;
                 drawCrossing(x, y, false);
                 n--;
-            
+
             }
-            
+
         }
     }
-    
+
     private void placeBuildings(int n) {
         int clientDestinationCounter = 0;
         while (n >= 0) {
             int x = Greenfoot.getRandomNumber(N_TILE - 1);
             int y = Greenfoot.getRandomNumber(N_TILE - 1);
 
-            if ((tiles[x][y] == TILE_TYPE_GRASS) && (tiles[x-1][y] != TILE_TYPE_GRASS || tiles[x+1][y] != TILE_TYPE_GRASS) ){
+            if ((tiles[x][y] == TILE_TYPE_GRASS)
+                    && (tiles[x - 1][y] != TILE_TYPE_GRASS || tiles[x + 1][y] != TILE_TYPE_GRASS)) {
 
                 // The first 4 buildings are set as destination
                 if (n < N_CLIENTS) {
@@ -516,28 +528,31 @@ public class MyWorld extends World {
 
         GreenfootImage image = getBackground();
         image.setColor(TILE_ROAD_COLOR);
-        //image.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+        // image.fillRect(x, y, TILE_SIZE, TILE_SIZE);
 
         // Add bands on top
         image.setColor(TILE_CROSSING_COLOR);
-        if(vertical == false){
-        boolean crossing_b = true;
-        for (int p = 0; p < TILE_SIZE; p += CROSSING_BANDS_WIDTH) {
-            if (crossing_b) {
-                image.fillRect(x, y + p, TILE_SIZE , CROSSING_BANDS_WIDTH);
-                crossing_b = false;
-            } else {
-                crossing_b = true;
-            }}
+        if (vertical == false) {
+            boolean crossing_b = true;
+            for (int p = 0; p < TILE_SIZE; p += CROSSING_BANDS_WIDTH) {
+                if (crossing_b) {
+                    image.fillRect(x, y + p, TILE_SIZE, CROSSING_BANDS_WIDTH);
+                    crossing_b = false;
+                } else {
+                    crossing_b = true;
+                }
+            }
+        } else {
+            boolean crossing_b = true;
+            for (int p = 0; p < TILE_SIZE; p += CROSSING_BANDS_WIDTH) {
+                if (crossing_b) {
+                    image.fillRect(x + p, y, CROSSING_BANDS_WIDTH, TILE_SIZE);
+                    crossing_b = false;
+                } else {
+                    crossing_b = true;
+                }
+            }
         }
-        else{ boolean crossing_b = true;
-        for (int p = 0; p < TILE_SIZE; p += CROSSING_BANDS_WIDTH) {
-            if (crossing_b) {
-                image.fillRect(x+p, y, CROSSING_BANDS_WIDTH, TILE_SIZE);
-                crossing_b = false;
-            } else {
-                crossing_b = true;
-            }}}
 
     }
 
@@ -551,8 +566,6 @@ public class MyWorld extends World {
         image.drawImage(sprite, x, y);
 
     }
-
-    
 
     private void runClock() {
         clockRegulator = (clockRegulator + 1) % 70;
