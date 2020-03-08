@@ -70,6 +70,7 @@ public class MyWorld extends World {
     static final boolean GAME_OVER_ITALIC = false;
     static final int GAME_OVER_FONT_SIZE = TILE_SIZE;
     static final String GAME_OVER_STRING = "GAME OVER \n PLAYER 2 WON !";
+    static final String GAME_OVER_STRING2 = "GAME OVER \n PLAYER 1 WON !";
     static final Color GAME_OVER_FOREGROUND = new Color(255, 255, 255);
     static final Color GAME_OVER_BACKGROUND = new Color(0, 0, 0);
     static final Color GAME_OVER_OUTLINE = new Color(255, 0, 0);
@@ -79,6 +80,9 @@ public class MyWorld extends World {
     // should be the same as oldlady life duration
     int player2Cooldown = OldLady.LIFE_DURATION;
     boolean gameOver = false;
+    boolean playGameOver = false;
+    boolean crashHasPlayed = false;
+
     int[][] tiles = new int[N_TILE][N_TILE];
     Car car;
 
@@ -148,7 +152,7 @@ public class MyWorld extends World {
     public void act() {
         // Player 1
         Position carPosition = car.getPosition();
-
+        if(droppedOffClients == N_CLIENTS){gameOver =true;};
         // Value is -1 if the car is not next to a client, and if it is, the value is
         // the client's number
         int carNextToClient = -1;
@@ -250,12 +254,25 @@ public class MyWorld extends World {
         if (gameOver) {
             removeObject(car);
             drawGameOver();
-            Greenfoot.playSound("crash.wav");
+            playGameOver = true;
+            
         } else {
             // update clock
             runClock();
         }
-
+        
+        if(playGameOver == true){
+        GreenfootSound crash = new GreenfootSound("crash.wav");
+        if(!crashHasPlayed){crash.play();
+            crashHasPlayed =true;};
+            
+        if( crashHasPlayed == true){ 
+            //gotta give time for the sound to play
+            Greenfoot.delay(1000);
+            crash.stop();   
+            playGameOver = false;}
+        
+        }
         // If the car is next to a client, get the client in the car
         if (carNextToClient != -1) {
             if (clientInTheCar == -1) {
@@ -433,12 +450,15 @@ public class MyWorld extends World {
         // First, fill the entire screen with a rectangle
         image.setColor(GAME_OVER_BACKGROUND);
         image.fillRect(0, 0, WORLD_X, WORLD_Y);
-
+        if(droppedOffClients != N_CLIENTS){
         GreenfootImage g = new GreenfootImage(GAME_OVER_STRING, GAME_OVER_FONT_SIZE, GAME_OVER_FOREGROUND,
                 GAME_OVER_BACKGROUND, GAME_OVER_OUTLINE);
-
+        image.drawImage(g, (WORLD_X - g.getWidth()) / 2, (WORLD_Y - g.getHeight()) / 2);}
+        else{GreenfootImage g = new GreenfootImage(GAME_OVER_STRING2, GAME_OVER_FONT_SIZE, GAME_OVER_FOREGROUND,
+                GAME_OVER_BACKGROUND, GAME_OVER_OUTLINE);
+        image.drawImage(g, (WORLD_X - g.getWidth()) / 2, (WORLD_Y - g.getHeight()) / 2);};
         // Draw the text at the center of the screen
-        image.drawImage(g, (WORLD_X - g.getWidth()) / 2, (WORLD_Y - g.getHeight()) / 2);
+        
     }
 
     private void drawVerticalRoad(int i, int j) {
@@ -572,7 +592,7 @@ public class MyWorld extends World {
         if (clockRegulator == 0) {
             clockTime--;
             clock.setImage(new GreenfootImage("Time: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
-            if (clockTime == 0) {
+            if (clockTime < 0) {
                 gameOver = true;
             }
 
