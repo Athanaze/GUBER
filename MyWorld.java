@@ -79,10 +79,11 @@ public class MyWorld extends World {
     int player2Ammo = 5;
     // should be the same as oldlady life duration
     int player2Cooldown = OldLady.LIFE_DURATION;
+  
     boolean gameOver = false;
     boolean playGameOver = false;
     boolean crashHasPlayed = false;
-
+    
     int[][] tiles = new int[N_TILE][N_TILE];
     Car car;
 
@@ -99,6 +100,9 @@ public class MyWorld extends World {
     public MyWorld() {
         // Create a new world with X by Y cells with a cell size of S pixels.
         super(WORLD_X, WORLD_Y, WORLD_S);
+        StartScreen startScreen = new StartScreen();
+        
+        addObject(startScreen, WORLD_X/2, WORLD_Y/2);
         clock.setImage(new GreenfootImage("Time: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
         clientScore.setImage(
                 new GreenfootImage("Client score: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
@@ -135,7 +139,6 @@ public class MyWorld extends World {
         }
         placeBuildings(NB_BUILDINGS);
         // Place some crossings on the roads
-        // For now, we just use some hard-coded positions
         placeCrossings(NB_CROSSINGS);
         placeClients();
 
@@ -147,18 +150,21 @@ public class MyWorld extends World {
          * "nice" when the game is not yet running.
          */
         addObject(car, TILE_SIZE, TILE_SIZE);
+        
     }
 
     public void act() {
+     if(getObjects(StartScreen.class).size()== 0){
         // Player 1
         Position carPosition = car.getPosition();
+        //makes P1 wins when he dropped every client;
         if(droppedOffClients == N_CLIENTS){gameOver =true;};
         // Value is -1 if the car is not next to a client, and if it is, the value is
         // the client's number
         int carNextToClient = -1;
         int r = -1;
         boolean dropOffClient = false;
-
+        
         // Check if the car position is valid, if it's not, game over => player 2 win
         // the game
         gameOver = car.gameOver;
@@ -291,7 +297,7 @@ public class MyWorld extends World {
                 greenfoot.Color.BLACK, greenfoot.Color.WHITE));
         player2_Ammo.setImage(
                 new GreenfootImage("mémés: " + player2Ammo, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
-    }
+    }}
 
     public void setTileType(Position p, int tile_type){
         tiles[p.x][p.y] = tile_type;
@@ -423,7 +429,7 @@ public class MyWorld extends World {
             int y = Greenfoot.getRandomNumber(N_TILE - 1);
 
             if ((tiles[x][y] == TILE_TYPE_GRASS)
-                    && (tiles[x - 1][y] != TILE_TYPE_GRASS || tiles[x + 1][y] != TILE_TYPE_GRASS)) {
+                    && (tiles[x - 1][y] != TILE_TYPE_GRASS || tiles[x + 1][y] != TILE_TYPE_GRASS || tiles[x + 1][y] != TILE_TYPE_BUILDING || tiles[x - 1][y] != TILE_TYPE_BUILDING)) {
 
                 // The first 4 buildings are set as destination
                 if (n < N_CLIENTS) {
@@ -460,7 +466,7 @@ public class MyWorld extends World {
         // Draw the text at the center of the screen
         
     }
-
+    
     private void drawVerticalRoad(int i, int j) {
         int x = i * TILE_SIZE;
         int y = j * TILE_SIZE;
@@ -604,7 +610,8 @@ public class MyWorld extends World {
             while (true) {
                 int x = Greenfoot.getRandomNumber(N_TILE - 1);
                 int y = Greenfoot.getRandomNumber(N_TILE - 1);
-                if (tiles[x][y] == TILE_TYPE_BUILDING) {
+                // check if its a building not next to a crossing
+                if (tiles[x][y] == TILE_TYPE_BUILDING && tiles[x-1][y] != TILE_TYPE_CROSSING && tiles[x+1][y] != TILE_TYPE_CROSSING && tiles[x][y-1] != TILE_TYPE_CROSSING && tiles[x][y+1] != TILE_TYPE_CROSSING) {
                     tiles[x][y] = TILE_TYPE_CLIENTS[i];
                     clients[i] = new Client();
                     clients[i].setColor(i);
