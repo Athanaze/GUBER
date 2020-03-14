@@ -9,10 +9,15 @@ public class MyWorld extends World {
     public static final int TILE_SIZE = WORLD_X / N_TILE;
 
     static final int ROAD_BLACKNESS = 128;
+    static final int DARK_GRAY = 100;
+    static final int LIGHT_GRAY = 150;
+    static final int BUILDING_BORDER_SIZE = 2;
+    static final int GRAY_VARIATION = 70;
 
     static final Color TILE_ROAD_COLOR = new Color(ROAD_BLACKNESS, ROAD_BLACKNESS, ROAD_BLACKNESS);
     static final Color TILE_GRASS_COLOR = new Color(10, 150, 0);
     static final Color TILE_BUILDING_COLOR = new Color(255, 204, 102);
+    static final Color TILE_BUILDING_COLOR_DARK_GRAY = new Color(DARK_GRAY, DARK_GRAY, DARK_GRAY);
     static final Color TILE_CROSSING_COLOR = new Color(255, 255, 0);
     static final Color TILE_CLIENT_COLOR = new Color(0, 0, 0);
     static final int N_TYPES = 3;
@@ -21,8 +26,9 @@ public class MyWorld extends World {
 
     static final int N_CROSSING_BANDS = 4;
     static final int CROSSING_BANDS_WIDTH = TILE_SIZE / (N_CROSSING_BANDS * 2);
-    static final int NB_BUILDINGS = 10;
+    static final int NB_BUILDINGS = 500;
     static final int NB_CROSSINGS = 10;
+    static final int BUILDING_IMAGE_OFFSET = 10;
 
     static final int TILE_TYPE_BUILDING = 0;
     static final int TILE_TYPE_VERTICAL = 1;
@@ -79,11 +85,11 @@ public class MyWorld extends World {
     int player2Ammo = 5;
     // should be the same as oldlady life duration
     int player2Cooldown = OldLady.LIFE_DURATION;
-  
+
     boolean gameOver = false;
     boolean playGameOver = false;
     boolean crashHasPlayed = false;
-    
+
     int[][] tiles = new int[N_TILE][N_TILE];
     Car car;
 
@@ -101,8 +107,8 @@ public class MyWorld extends World {
         // Create a new world with X by Y cells with a cell size of S pixels.
         super(WORLD_X, WORLD_Y, WORLD_S);
         StartScreen startScreen = new StartScreen();
-        
-        addObject(startScreen, WORLD_X/2, WORLD_Y/2);
+
+        addObject(startScreen, WORLD_X / 2, WORLD_Y / 2);
         clock.setImage(new GreenfootImage("Time: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
         clientScore.setImage(
                 new GreenfootImage("Client score: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
@@ -150,158 +156,168 @@ public class MyWorld extends World {
          * "nice" when the game is not yet running.
          */
         addObject(car, TILE_SIZE, TILE_SIZE);
-        
+
     }
 
     public void act() {
-     if(getObjects(StartScreen.class).size()== 0){
-        // Player 1
-        Position carPosition = car.getPosition();
-        //makes P1 wins when he dropped every client;
-        if(droppedOffClients == N_CLIENTS){gameOver =true;};
-        // Value is -1 if the car is not next to a client, and if it is, the value is
-        // the client's number
-        int carNextToClient = -1;
-        int r = -1;
-        boolean dropOffClient = false;
-        
-        // Check if the car position is valid, if it's not, game over => player 2 win
-        // the game
-        gameOver = car.gameOver;
+        if (getObjects(StartScreen.class).size() == 0) {
+            // Player 1
+            Position carPosition = car.getPosition();
+            // makes P1 wins when he dropped every client;
+            if (droppedOffClients == N_CLIENTS) {
+                gameOver = true;
+            }
+            ;
+            // Value is -1 if the car is not next to a client, and if it is, the value is
+            // the client's number
+            int carNextToClient = -1;
+            int r = -1;
+            boolean dropOffClient = false;
 
-        switch (tiles[carPosition.x][carPosition.y]) {
-            case TILE_TYPE_VERTICAL:
-                // if there is noboy in the car, look if there is a client we could pick up
+            // Check if the car position is valid, if it's not, game over => player 2 win
+            // the game
+            gameOver = car.gameOver;
+
+            switch (tiles[carPosition.x][carPosition.y]) {
+                case TILE_TYPE_VERTICAL:
+                    // if there is noboy in the car, look if there is a client we could pick up
+                    if (clientInTheCar == -1) {
+                        r = checkIfCarIsNextToClient(carPosition, true);
+                        if (r != -1) {
+                            carNextToClient = r;
+                            System.out.println(r);
+                        }
+                    }
+
+                    // If there is a client in the car, check if we can drop him off
+                    else {
+                        dropOffClient = checkToDropOffClient(carPosition, true, clientInTheCar);
+
+                    }
+
+                    break;
+
+                case TILE_TYPE_HORIZONTAL:
+                    // if there is noboy in the car, look if there is a client we could pick up
+                    if (clientInTheCar == -1) {
+                        r = checkIfCarIsNextToClient(carPosition, false);
+
+                        if (r != -1) {
+                            carNextToClient = r;
+                        }
+                    }
+
+                    // If there is a client in the car, check if we can drop him off
+                    else {
+                        dropOffClient = checkToDropOffClient(carPosition, false, clientInTheCar);
+
+                    }
+
+                    break;
+
+                case TILE_TYPE_INTERSECTION:
+                    break;
+
+                case TILE_TYPE_CROSSING:
+                    gameOver = false;
+                    break;
+
+                case TILE_TYPE_BUILDING:
+                    gameOver = true;
+                    break;
+
+                case TILE_TYPE_GRASS:
+                    gameOver = true;
+                    break;
+
+                case TILE_TYPE_OLD_LADY:
+                    gameOver = true;
+                    break;
+            }
+
+            // Player 2
+            MouseInfo mouse = Greenfoot.getMouseInfo();
+            if (mouse != null) {
+                Position tilePosition = getTilePosition(mouse.getX(), mouse.getY());
+                if (mouse.getButton() == 1 && Greenfoot.mouseClicked(null)) {
+
+                    // Check if the clicked tile is a crossing, and spawn an old lady if this is the
+                    // case
+                    if (tiles[tilePosition.x][tilePosition.y] == TILE_TYPE_CROSSING
+                            && tiles[tilePosition.x][tilePosition.y] != TILE_TYPE_OLD_LADY) {
+
+                        if (player2Ammo > 0) {
+                            Greenfoot.playSound("old_lady_spawned.wav");
+                            addObject(new OldLady(tilePosition), tilePosition.x * TILE_SIZE,
+                                    tilePosition.y * TILE_SIZE);
+                            player2Ammo--;
+                            tiles[tilePosition.x][tilePosition.y] = TILE_TYPE_OLD_LADY;
+                        }
+                    }
+
+                }
+
+            }
+            if (player2Ammo < PLAYER2_MAX_AMMO) {
+                if (player2Cooldown < 1) {
+                    player2Ammo++;
+                    player2Cooldown = OldLady.LIFE_DURATION;
+
+                }
+            }
+            player2Cooldown--;
+
+            if (gameOver) {
+                removeObject(car);
+                drawGameOver();
+                playGameOver = true;
+
+            } else {
+                // update clock
+                runClock();
+            }
+
+            if (playGameOver == true) {
+                GreenfootSound crash = new GreenfootSound("crash.wav");
+                if (!crashHasPlayed) {
+                    crash.play();
+                    crashHasPlayed = true;
+                }
+                ;
+
+                if (crashHasPlayed == true) {
+                    // gotta give time for the sound to play
+                    Greenfoot.delay(1000);
+                    crash.stop();
+                    playGameOver = false;
+                }
+
+            }
+            // If the car is next to a client, get the client in the car
+            if (carNextToClient != -1) {
                 if (clientInTheCar == -1) {
-                    r = checkIfCarIsNextToClient(carPosition, true);
-                    if (r != -1) {
-                        carNextToClient = r;
-                        System.out.println(r);
-                    }
+                    clients[carNextToClient].getInTheCar();
+                    clientInTheCar = carNextToClient;
                 }
-
-                // If there is a client in the car, check if we can drop him off
-                else {
-                    dropOffClient = checkToDropOffClient(carPosition, true, clientInTheCar);
-
-                }
-
-                break;
-
-            case TILE_TYPE_HORIZONTAL:
-                // if there is noboy in the car, look if there is a client we could pick up
-                if (clientInTheCar == -1) {
-                    r = checkIfCarIsNextToClient(carPosition, false);
-
-                    if (r != -1) {
-                        carNextToClient = r;
-                    }
-                }
-
-                // If there is a client in the car, check if we can drop him off
-                else {
-                    dropOffClient = checkToDropOffClient(carPosition, false, clientInTheCar);
-
-                }
-
-                break;
-
-            case TILE_TYPE_INTERSECTION:
-                break;
-
-            case TILE_TYPE_CROSSING:
-                gameOver = false;
-                break;
-
-            case TILE_TYPE_BUILDING:
-                gameOver = true;
-                break;
-
-            case TILE_TYPE_GRASS:
-                gameOver = true;
-                break;
-
-            case TILE_TYPE_OLD_LADY:
-                gameOver = true;
-                break;
-        }
-
-        // Player 2
-        MouseInfo mouse = Greenfoot.getMouseInfo();
-        if (mouse != null) {
-            Position tilePosition = getTilePosition(mouse.getX(), mouse.getY());
-            if (mouse.getButton() == 1 && Greenfoot.mouseClicked(null)) {
-
-                // Check if the clicked tile is a crossing, and spawn an old lady if this is the
-                // case
-                if (tiles[tilePosition.x][tilePosition.y] == TILE_TYPE_CROSSING
-                        && tiles[tilePosition.x][tilePosition.y] != TILE_TYPE_OLD_LADY) {
-
-                    if (player2Ammo > 0) {
-                        Greenfoot.playSound("old_lady_spawned.wav");
-                        addObject(new OldLady(tilePosition), tilePosition.x * TILE_SIZE, tilePosition.y * TILE_SIZE);
-                        player2Ammo--;
-                        tiles[tilePosition.x][tilePosition.y] = TILE_TYPE_OLD_LADY;
-                    }
-                }
-
             }
 
-        }
-        if (player2Ammo < PLAYER2_MAX_AMMO) {
-            if (player2Cooldown < 1) {
-                player2Ammo++;
-                player2Cooldown = OldLady.LIFE_DURATION;
-
+            // If we dropped of a client, count it
+            if (dropOffClient) {
+                clients[clientInTheCar].dropOff(carPosition.x, carPosition.y);
+                droppedOffClients++;
+                clientInTheCar = -1;
             }
+            clientScore.setImage(new GreenfootImage("Client score: " + Integer.toString(droppedOffClients), 20,
+                    greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+            player2_Ammo.setImage(
+                    new GreenfootImage("mémés: " + player2Ammo, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
         }
-        player2Cooldown--;
+    }
 
-        if (gameOver) {
-            removeObject(car);
-            drawGameOver();
-            playGameOver = true;
-            
-        } else {
-            // update clock
-            runClock();
-        }
-        
-        if(playGameOver == true){
-        GreenfootSound crash = new GreenfootSound("crash.wav");
-        if(!crashHasPlayed){crash.play();
-            crashHasPlayed =true;};
-            
-        if( crashHasPlayed == true){ 
-            //gotta give time for the sound to play
-            Greenfoot.delay(1000);
-            crash.stop();   
-            playGameOver = false;}
-        
-        }
-        // If the car is next to a client, get the client in the car
-        if (carNextToClient != -1) {
-            if (clientInTheCar == -1) {
-                clients[carNextToClient].getInTheCar();
-                clientInTheCar = carNextToClient;
-            }
-        }
-
-        // If we dropped of a client, count it
-        if (dropOffClient) {
-            clients[clientInTheCar].dropOff(carPosition.x, carPosition.y);
-            droppedOffClients++;
-            clientInTheCar = -1;
-        }
-        clientScore.setImage(new GreenfootImage("Client score: " + Integer.toString(droppedOffClients), 20,
-                greenfoot.Color.BLACK, greenfoot.Color.WHITE));
-        player2_Ammo.setImage(
-                new GreenfootImage("mémés: " + player2Ammo, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
-    }}
-
-    public void setTileType(Position p, int tile_type){
+    public void setTileType(Position p, int tile_type) {
         tiles[p.x][p.y] = tile_type;
     }
+
     // When axis = true, we check on the x axis, otherwise on the y axis
     private int checkIfCarIsNextToClient(Position carPosition, boolean axis) {
         int xValue = 0;
@@ -429,7 +445,8 @@ public class MyWorld extends World {
             int y = Greenfoot.getRandomNumber(N_TILE - 1);
 
             if ((tiles[x][y] == TILE_TYPE_GRASS)
-                    && (tiles[x - 1][y] != TILE_TYPE_GRASS || tiles[x + 1][y] != TILE_TYPE_GRASS || tiles[x + 1][y] != TILE_TYPE_BUILDING || tiles[x - 1][y] != TILE_TYPE_BUILDING)) {
+                    && (tiles[x - 1][y] != TILE_TYPE_GRASS || tiles[x + 1][y] != TILE_TYPE_GRASS
+                            || tiles[x + 1][y] != TILE_TYPE_BUILDING || tiles[x - 1][y] != TILE_TYPE_BUILDING)) {
 
                 // The first 4 buildings are set as destination
                 if (n < N_CLIENTS) {
@@ -439,7 +456,30 @@ public class MyWorld extends World {
 
                 } else {
                     tiles[x][y] = TILE_TYPE_BUILDING;
-                    drawBuilding(x, y);
+                    if(n % 2 == 0){
+                        drawBuilding(x, y);
+                    }
+                    else{
+                        if(n % 3 == 0){
+                            int r = Greenfoot.getRandomNumber(3);
+                            switch(r){
+                                case 0:
+                                    drawFountain(x,y);
+                                    break;
+                                case 1:
+                                    drawTree(x,y);
+                                    break;
+                                case 2:
+                                    drawHelicopterPad(x, y);
+                                    break;
+                            }
+                        }
+                        else{
+                            drawBuilding2(x, y);
+                        }
+                        
+                    }
+                    
                 }
 
                 n--;
@@ -456,17 +496,20 @@ public class MyWorld extends World {
         // First, fill the entire screen with a rectangle
         image.setColor(GAME_OVER_BACKGROUND);
         image.fillRect(0, 0, WORLD_X, WORLD_Y);
-        if(droppedOffClients != N_CLIENTS){
-        GreenfootImage g = new GreenfootImage(GAME_OVER_STRING, GAME_OVER_FONT_SIZE, GAME_OVER_FOREGROUND,
-                GAME_OVER_BACKGROUND, GAME_OVER_OUTLINE);
-        image.drawImage(g, (WORLD_X - g.getWidth()) / 2, (WORLD_Y - g.getHeight()) / 2);}
-        else{GreenfootImage g = new GreenfootImage(GAME_OVER_STRING2, GAME_OVER_FONT_SIZE, GAME_OVER_FOREGROUND,
-                GAME_OVER_BACKGROUND, GAME_OVER_OUTLINE);
-        image.drawImage(g, (WORLD_X - g.getWidth()) / 2, (WORLD_Y - g.getHeight()) / 2);};
+        if (droppedOffClients != N_CLIENTS) {
+            GreenfootImage g = new GreenfootImage(GAME_OVER_STRING, GAME_OVER_FONT_SIZE, GAME_OVER_FOREGROUND,
+                    GAME_OVER_BACKGROUND, GAME_OVER_OUTLINE);
+            image.drawImage(g, (WORLD_X - g.getWidth()) / 2, (WORLD_Y - g.getHeight()) / 2);
+        } else {
+            GreenfootImage g = new GreenfootImage(GAME_OVER_STRING2, GAME_OVER_FONT_SIZE, GAME_OVER_FOREGROUND,
+                    GAME_OVER_BACKGROUND, GAME_OVER_OUTLINE);
+            image.drawImage(g, (WORLD_X - g.getWidth()) / 2, (WORLD_Y - g.getHeight()) / 2);
+        }
+        ;
         // Draw the text at the center of the screen
-        
+
     }
-    
+
     private void drawVerticalRoad(int i, int j) {
         int x = i * TILE_SIZE;
         int y = j * TILE_SIZE;
@@ -524,6 +567,44 @@ public class MyWorld extends World {
         image.setColor(TILE_BUILDING_COLOR);
 
         image.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+    }
+
+    private void drawBuilding2(int i, int j) {
+        // First, draw the light square, then the dark one inside it
+        int x = i * TILE_SIZE;
+        int y = j * TILE_SIZE;
+
+        GreenfootImage image = getBackground();
+        int lgrayVariation = LIGHT_GRAY+Greenfoot.getRandomNumber(GRAY_VARIATION);
+        image.setColor(new Color(lgrayVariation, lgrayVariation, lgrayVariation));
+
+        image.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+        int dgrayVariation = DARK_GRAY+Greenfoot.getRandomNumber(GRAY_VARIATION);
+        image.setColor(new Color(dgrayVariation, dgrayVariation, dgrayVariation));
+
+        image.fillRect(
+                x + BUILDING_BORDER_SIZE,
+                y + BUILDING_BORDER_SIZE,
+                TILE_SIZE - (2*BUILDING_BORDER_SIZE),
+                TILE_SIZE - (2*BUILDING_BORDER_SIZE)
+                );
+    }
+    // A fountain is also a "building", it's just a different representation of the same concept (another view of the same model)
+    private void drawFountain(int i, int j) {
+        Building_image fountain = new Building_image();
+        addObject(fountain, (i*TILE_SIZE)+BUILDING_IMAGE_OFFSET, (j*TILE_SIZE)+BUILDING_IMAGE_OFFSET);
+    }
+
+    private void drawTree(int i, int j) {
+        Building_image tree = new Building_image();
+        tree.setImage("tree.png");
+        addObject(tree, (i*TILE_SIZE)+BUILDING_IMAGE_OFFSET, (j*TILE_SIZE)+BUILDING_IMAGE_OFFSET);
+    }
+
+    private void drawHelicopterPad(int i, int j) {
+        Building_image heli = new Building_image();
+        heli.setImage("helicopter_pad.png");
+        addObject(heli, (i*TILE_SIZE)+BUILDING_IMAGE_OFFSET, (j*TILE_SIZE)+BUILDING_IMAGE_OFFSET);
     }
 
     private void drawDestination(int i, int j, int colorIndex) {
@@ -611,7 +692,9 @@ public class MyWorld extends World {
                 int x = Greenfoot.getRandomNumber(N_TILE - 1);
                 int y = Greenfoot.getRandomNumber(N_TILE - 1);
                 // check if its a building not next to a crossing
-                if (tiles[x][y] == TILE_TYPE_BUILDING && tiles[x-1][y] != TILE_TYPE_CROSSING && tiles[x+1][y] != TILE_TYPE_CROSSING && tiles[x][y-1] != TILE_TYPE_CROSSING && tiles[x][y+1] != TILE_TYPE_CROSSING) {
+                if (tiles[x][y] == TILE_TYPE_BUILDING && tiles[x - 1][y] != TILE_TYPE_CROSSING
+                        && tiles[x + 1][y] != TILE_TYPE_CROSSING && tiles[x][y - 1] != TILE_TYPE_CROSSING
+                        && tiles[x][y + 1] != TILE_TYPE_CROSSING) {
                     tiles[x][y] = TILE_TYPE_CLIENTS[i];
                     clients[i] = new Client();
                     clients[i].setColor(i);

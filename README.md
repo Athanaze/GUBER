@@ -1,14 +1,12 @@
 # TODO
-
++ AJOUTER LES OBJECTIFS DANS LE PROJET PLZ
 + The sounds effects are buggy
 + Make the client disapear when in the car
 
 + Fancy animation when we drop off the client
 + Win screen for player 1
 + Improve timer mechanics
-+ Start screen
 + Add animations for oldLadies?
-+ Improve gameOver screen
 
 # Gameplay
 
