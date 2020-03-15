@@ -102,7 +102,10 @@ public class MyWorld extends World {
     int droppedOffClients = 0; // When it is == to N_CLIENTS, player 1 wins the game.
     int clientInTheCar = -1; // -1 when there is nobody in the car, otherwise is equal to the number of the
     // client (0, 1, 2 or 3)
-
+    int buildingX;
+    int buildingY; 
+    Position destination;
+    
     public MyWorld() {
         // Create a new world with X by Y cells with a cell size of S pixels.
         super(WORLD_X, WORLD_Y, WORLD_S);
@@ -303,8 +306,17 @@ public class MyWorld extends World {
 
             // If we dropped of a client, count it
             if (dropOffClient) {
+                while(tiles[buildingX][buildingY] != TILE_TYPE_CLIENT_0_DESTINATION + clients[clientInTheCar].color){
+                    buildingX = Greenfoot.getRandomNumber(N_TILE - 1);
+                    buildingY = Greenfoot.getRandomNumber(N_TILE - 1);
+                    destination = getTilePosition(buildingX, buildingY);
+                 };
                 clients[clientInTheCar].dropOff(carPosition.x, carPosition.y);
                 droppedOffClients++;
+                
+                
+                
+
                 clientInTheCar = -1;
             }
             clientScore.setImage(new GreenfootImage("Client score: " + Integer.toString(droppedOffClients), 20,
@@ -444,12 +456,14 @@ public class MyWorld extends World {
             int x = Greenfoot.getRandomNumber(N_TILE - 1);
             int y = Greenfoot.getRandomNumber(N_TILE - 1);
 
-            if ((tiles[x][y] == TILE_TYPE_GRASS)
-                    && (tiles[x - 1][y] != TILE_TYPE_GRASS || tiles[x + 1][y] != TILE_TYPE_GRASS
-                            || tiles[x + 1][y] != TILE_TYPE_BUILDING || tiles[x - 1][y] != TILE_TYPE_BUILDING)) {
+            if ((tiles[x][y] == TILE_TYPE_GRASS))
+                     {
 
                 // The first 4 buildings are set as destination
-                if (n < N_CLIENTS) {
+                if ((n < N_CLIENTS)&& (tiles[x - 1][y] != TILE_TYPE_GRASS || tiles[x + 1][y] != TILE_TYPE_GRASS
+                            || tiles[x ][y+1] != TILE_TYPE_GRASS || tiles[x][y-1] != TILE_TYPE_GRASS
+                            || tiles[x + 1][y] != TILE_TYPE_BUILDING || tiles[x - 1][y] != TILE_TYPE_BUILDING
+                            || tiles[x][y+1] != TILE_TYPE_BUILDING|| tiles[x ][y-1] != TILE_TYPE_BUILDING)) {
                     tiles[x][y] = TILE_TYPE_CLIENT_DESTINATIONS[n];
 
                     drawDestination(x, y, n);

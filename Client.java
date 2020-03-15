@@ -1,4 +1,4 @@
-import greenfoot.*; // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
+ import greenfoot.*; // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
 import java.util.List;
 
 public class Client extends Actor {
@@ -29,22 +29,28 @@ public class Client extends Actor {
     static final int TILE_TYPE_OLD_LADY = 4;
     static final int TILE_TYPE_CAR = 5;
     boolean moveright = false;
-    boolean moveleft = false;
+    
     boolean moveup = false;
-    boolean movedown = false;
-
+    
+    boolean moveupbuild;
+    boolean moverightbuild;
+    
+    int color;
+    
+    boolean dropped = false;
     public void act() {
         GreenfootImage image = getImage();
         image.scale(TILE_SIZE, TILE_SIZE);
         List cars = getWorld().getObjects(Car.class);
         int positionx = getX();
         int positiony = getY();
+        
         if (moveup == true) {
             if (!cars.isEmpty()) {
                 Actor Car = (Actor) cars.get(0);
                 int cary = Car.getY();
                 if (this.getY() == cary) {
-                    image.scale(1, 1);
+                    image.clear();
                     setImage(image);
                     moveup = false;
                 }
@@ -64,7 +70,7 @@ public class Client extends Actor {
                 int cary = Car.getY();
                 if (this.getX() == carx) {
 
-                    image.scale(1, 1);
+                    image.clear();
                     setImage(image);
                     moveright = false;
                 }
@@ -77,6 +83,29 @@ public class Client extends Actor {
                 setImage(image);
             }
         }
+        if(dropped == true){
+            Position destination = ((MyWorld) getWorld()).destination;
+
+            if (moverightbuild) {
+                if(positionx == destination.x){image.clear();
+                
+                moverightbuild = false;
+                dropped = false;
+            }
+            else if(positionx - destination.x <0){
+                    setLocation(positionx +1, positiony);
+                } else {setLocation(positionx-1, positiony);
+                }}
+            if (moveupbuild){
+                if(positiony == destination.y){
+                moveupbuild = false;
+                dropped = false;
+                }    
+                else if(positiony - destination.y < 0){
+                    setLocation(positionx, positiony+1);}
+                    else{setLocation(positionx, positiony -1);}
+            }   
+            }
     }
 
     public void getInTheCar() {
@@ -104,14 +133,33 @@ public class Client extends Actor {
     // Called when the car is at the right destination
     public void dropOff(int tileX, int tileY) {
         Greenfoot.playSound("success.wav");
-        GreenfootImage image = getImage();
-        image.scale(TILE_SIZE, TILE_SIZE);
-        setImage(image);
-
-        setLocation(tileX * TILE_SIZE + (TILE_SIZE / 2), tileY * TILE_SIZE + (TILE_SIZE / 2));
+        setColor(color);
+        List cars = getWorld().getObjects(Car.class);
+        Position destination = ((MyWorld) getWorld()).destination;
+        
+        
+        if (!cars.isEmpty()) {
+            Actor Car = (Actor) cars.get(0);
+            int carx = Car.getX();
+            int cary = Car.getY();
+            while(this.getX() != carx || this.getY() != cary){
+             setLocation(carx , cary);
+             dropped = true;
+            }
+            if(this.getX() - destination.x <0 ){
+                moverightbuild = true;
+            }
+            if(this.getY() - destination.y <0){
+                moveupbuild = true;
+            }
+        }
+        
     }
+
 
     public void setColor(int colorIndex) {
         setImage("client" + Integer.toString(colorIndex) + ".png");
+        color = colorIndex;
+
     }
 }
