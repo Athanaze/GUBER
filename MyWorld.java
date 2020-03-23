@@ -56,7 +56,7 @@ public class MyWorld extends World {
     
     private Actor clock = new Actor() {
     };
-    private int clockTime = 50;
+    private int clockTime = 5;
     private int clockRegulator;
 
     private Actor clientScore = new Actor() {
@@ -87,8 +87,10 @@ public class MyWorld extends World {
     int player2Cooldown = OldLady.LIFE_DURATION;
 
     boolean gameOver = false;
+    // 0 for crash, 1 for rolling on a grandMa, 2 for out of time, 3 for P1 wins
+    int gameOverType;
     boolean playGameOver = false;
-    boolean crashHasPlayed = false;
+    boolean soundHasPlayed = false;
 
     int[][] tiles = new int[N_TILE][N_TILE];
     Car car;
@@ -106,6 +108,7 @@ public class MyWorld extends World {
     int buildingY; 
     int destinationX;
     int destinationY;
+    boolean drawDisplay = true;
     
     
     public MyWorld() {
@@ -155,7 +158,14 @@ public class MyWorld extends World {
         StartScreen startScreen = new StartScreen();
 
         addObject(startScreen, WORLD_X / 2, WORLD_Y / 2);
-        clock.setImage(new GreenfootImage("Time: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+        
+
+    }
+
+    public void act() {
+        // to play gameover sound for oldlady
+        boolean gameOverLady = car.gameOverLady;
+        if(drawDisplay){clock.setImage(new GreenfootImage("Time: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
         clientScore.setImage(
                 new GreenfootImage("Client score: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
 
@@ -167,16 +177,16 @@ public class MyWorld extends World {
                 new GreenfootImage("Old lady: " + player2Ammo, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
 
         addObject(player2_Ammo, PLAYER2_AMMO_X, PLAYER2_AMMO_Y);
-
-    }
-
-    public void act() {
+        drawDisplay = false;
+        }
         if (getObjects(StartScreen.class).size() == 0) {
             // Player 1
             Position carPosition = car.getPosition();
             // makes P1 wins when he dropped every client;
             if (droppedOffClients == N_CLIENTS) {
+                gameOverType = 3;
                 gameOver = true;
+                
             }
             // Value is -1 if the car is not next to a client, and if it is, the value is
             // the client's number
@@ -232,14 +242,17 @@ public class MyWorld extends World {
                     break;
 
                 case TILE_TYPE_BUILDING:
+                    gameOverType = 0;
                     gameOver = true;
                     break;
 
                 case TILE_TYPE_GRASS:
+                    gameOverType = 0;
                     gameOver = true;
                     break;
 
                 case TILE_TYPE_OLD_LADY:
+                    
                     gameOver = true;
                     break;
             }
@@ -282,22 +295,62 @@ public class MyWorld extends World {
             if (gameOver) {
                 removeObject(car);
                 drawGameOver();
+                if (gameOverLady){
+                gameOverType = 1;}
                 playGameOver = true;
-
+                
+            
             }
-            if (playGameOver) {
-                GreenfootSound crash = new GreenfootSound("crash.wav");
-                if (!crashHasPlayed) {
+            if (playGameOver) {switch( gameOverType){
+                case 0 : GreenfootSound crash = new GreenfootSound("crash.wav");
+                        if (!soundHasPlayed) {
                     crash.play();
-                    crashHasPlayed = true;
+                    soundHasPlayed = true;
                 }
-                // give time for the sound to play
-                if (crashHasPlayed) {
+                if (soundHasPlayed) {
                     
                     Greenfoot.delay(1000);
                     crash.stop();
                     playGameOver = false;
                 }
+                case 1 : GreenfootSound ladyKilled = new GreenfootSound("old_lady_killed.wav");
+                        if (!soundHasPlayed) {
+                    ladyKilled.play();
+                    soundHasPlayed = true;
+                }
+                if (soundHasPlayed) {
+                    
+                    Greenfoot.delay(1000);
+                    ladyKilled.stop();
+                    playGameOver = false;
+                }
+                case 2 : GreenfootSound timeOut = new GreenfootSound("hop.wav");
+                        if (!soundHasPlayed) {
+                    timeOut.play();
+                    soundHasPlayed = true;
+                }
+                if (soundHasPlayed) {
+                    
+                    Greenfoot.delay(1000);
+                    timeOut.stop();
+                    playGameOver = false;
+                }
+                case 3 : GreenfootSound guberWins = new GreenfootSound("hopop.wav");
+                        if (!soundHasPlayed) {
+                    guberWins.play();
+                    soundHasPlayed = true;
+                }
+                if (soundHasPlayed) {
+                    
+                    Greenfoot.delay(1000);
+                    guberWins.stop();
+                    playGameOver = false;
+                }
+            }
+                
+                
+                // give time for the sound to play
+                
 
             }
             // If the car is next to a client, get the client in the car
@@ -694,7 +747,7 @@ public class MyWorld extends World {
         GreenfootImage sprite = new GreenfootImage("car.png");
         sprite.scale(TILE_SIZE, TILE_SIZE);
         image.drawImage(sprite, x, y);
-
+        
     }
 
     private void runClock() {
@@ -703,6 +756,7 @@ public class MyWorld extends World {
             clockTime--;
             clock.setImage(new GreenfootImage("Time: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
             if (clockTime < 0) {
+                gameOverType = 2;
                 gameOver = true;
             }
 

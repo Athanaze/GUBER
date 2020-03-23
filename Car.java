@@ -39,6 +39,7 @@ public class Car extends Actor {
     static final int CAR_DOWN_ROTATION = 90;
     static final int CAR_UP_ROTATION = -90;
     boolean gameOver = false;
+    boolean gameOverLady = false;
     boolean move = false;
     int timer = 0;
     int delay = 0;
@@ -106,7 +107,7 @@ public class Car extends Actor {
         // method)
 
         if (isTouching(OldLady.class)) {
-            Greenfoot.playSound("old_lady_killed.wav");
+            gameOverLady =true;
             gameOver = true;
         }
     }
