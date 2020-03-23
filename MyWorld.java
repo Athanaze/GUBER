@@ -710,35 +710,25 @@ public class MyWorld extends World {
         }
     }
 
-    private void placeClients() {
+     private void placeClients() {
         for (int i = 0; i < 4; i++) {
             while (true) {
                 int x = Greenfoot.getRandomNumber(N_TILE - 1);
                 int y = Greenfoot.getRandomNumber(N_TILE - 1);
                 // check if its a building not next to a crossing
-                /*if 
-                if (tiles[x][y] == TILE_TYPE_BUILDING &&
-                    tiles[x - 1][y] != TILE_TYPE_CROSSING &&
-                    tiles[x + 1][y] != TILE_TYPE_CROSSING &&
-                    tiles[x][y - 1] != TILE_TYPE_CROSSING &&
-                    tiles[x][y + 1] != TILE_TYPE_CROSSING){
-                        tiles[x][y] = TILE_TYPE_CLIENTS[i];
-                        clients[i] = new Client();
-                        clients[i].setColor(i);
-                        addObject(clients[i], x * TILE_SIZE, y * TILE_SIZE);
-                        break;
-                }*/
-
-                if (checkTile(x-1, y) || checkTile(x+1, y) || checkTile(x, y-1) || checkTile(x, y+1)){
+                if (checkTile(x -1 ,y)|| checkTile(x + 1,y) ||  checkTile(x, y+1) || checkTile(x, y-1) ) {
                     tiles[x][y] = TILE_TYPE_CLIENTS[i];
-                        clients[i] = new Client();
-                        clients[i].setColor(i);
-                        addObject(clients[i], x * TILE_SIZE, y * TILE_SIZE);
-                        break;
+                    clients[i] = new Client();
+                    clients[i].setColor(i);
+                    addObject(clients[i], x * TILE_SIZE, y * TILE_SIZE);
+                    break;
                 }
             }
             // clients[i].setLocation(tileX*TILE_SIZE + (TILE_SIZE/2), tileY*TILE_SIZE +
             // (TILE_SIZE/2));
+        
+    
+             
         }
     }
     
