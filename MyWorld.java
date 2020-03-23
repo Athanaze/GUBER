@@ -716,13 +716,21 @@ public class MyWorld extends World {
                 int x = Greenfoot.getRandomNumber(N_TILE - 1);
                 int y = Greenfoot.getRandomNumber(N_TILE - 1);
                 // check if its a building not next to a crossing
-                if 
+                /*if 
                 if (tiles[x][y] == TILE_TYPE_BUILDING &&
                     tiles[x - 1][y] != TILE_TYPE_CROSSING &&
                     tiles[x + 1][y] != TILE_TYPE_CROSSING &&
                     tiles[x][y - 1] != TILE_TYPE_CROSSING &&
                     tiles[x][y + 1] != TILE_TYPE_CROSSING){
                         tiles[x][y] = TILE_TYPE_CLIENTS[i];
+                        clients[i] = new Client();
+                        clients[i].setColor(i);
+                        addObject(clients[i], x * TILE_SIZE, y * TILE_SIZE);
+                        break;
+                }*/
+
+                if (checkTile(x-1, y) || checkTile(x+1, y) || checkTile(x, y-1) || checkTile(x, y+1)){
+                    tiles[x][y] = TILE_TYPE_CLIENTS[i];
                         clients[i] = new Client();
                         clients[i].setColor(i);
                         addObject(clients[i], x * TILE_SIZE, y * TILE_SIZE);
@@ -734,7 +742,15 @@ public class MyWorld extends World {
         }
     }
     
+    // Return true if the tile is of the correct type
     private boolean checkTile(int x, int y){
-        return (tiles[x][y] == TILE_TYPE_HORIZONTAL || tiles[x][y] == TILE_TYPE_VERTICAL || tiles[x][y] == TILE_TYPE_CROSSING)
+        boolean r;
+        if(x <= 0 || y <=0){
+            r = false;
+        }
+        else{
+            r = (tiles[x][y] == TILE_TYPE_HORIZONTAL || tiles[x][y] == TILE_TYPE_VERTICAL || tiles[x][y] == TILE_TYPE_CROSSING);
+        }
+        return r;
     }
 }
