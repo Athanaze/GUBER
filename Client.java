@@ -1,4 +1,4 @@
- import greenfoot.*; // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
+import greenfoot.*; // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
 import java.util.List;
 
 public class Client extends Actor {
@@ -68,13 +68,13 @@ public class Client extends Actor {
                 Actor Car = (Actor) cars.get(0);
                 int carx = Car.getX();
                 int cary = Car.getY();
-                if (this.getX() == carx) {
+                if (positionx == carx) {
 
                     image.clear();
                     setImage(image);
                     moveright = false;
                 }
-                if (this.getX() - carx < 0) {
+                if (positionx - carx < 0) {
                     setLocation(positionx + 1, positiony);
                 } else {
                     setLocation(positionx - 1, positiony);
@@ -84,27 +84,23 @@ public class Client extends Actor {
             }
         }
         if(dropped == true){
-            Position destination = ((MyWorld) getWorld()).destination;
-
-            if (moverightbuild) {
-                if(positionx == destination.x){image.clear();
+            int destinationX = ((MyWorld) getWorld()).destinationX;
+            int destinationY = ((MyWorld) getWorld()).destinationY;
+            if(positionx == destinationX && positiony == destinationY){
+                image.clear();
+                setImage(image);
+                dropped = false;
+                }
+            if(positionx == destinationX){}
+                else if( destinationX - positionx < 0){
                 
-                moverightbuild = false;
-                dropped = false;
-            }
-            else if(positionx - destination.x <0){
-                    setLocation(positionx +1, positiony);
-                } else {setLocation(positionx-1, positiony);
-                }}
-            if (moveupbuild){
-                if(positiony == destination.y){
-                moveupbuild = false;
-                dropped = false;
-                }    
-                else if(positiony - destination.y < 0){
-                    setLocation(positionx, positiony+1);}
-                    else{setLocation(positionx, positiony -1);}
-            }   
+                setLocation(positionx -1 , positiony);}
+                else{setLocation(positionx +1 , positiony);}
+            if(positiony == destinationY){}
+            else if( destinationY - positiony < 0){
+                
+                setLocation(positionx  , positiony-1);}
+            else{setLocation(positionx  , positiony+1);}
             }
     }
 
@@ -135,26 +131,21 @@ public class Client extends Actor {
         Greenfoot.playSound("success.wav");
         setColor(color);
         List cars = getWorld().getObjects(Car.class);
-        Position destination = ((MyWorld) getWorld()).destination;
+        
         
         
         if (!cars.isEmpty()) {
             Actor Car = (Actor) cars.get(0);
             int carx = Car.getX();
             int cary = Car.getY();
-            while(this.getX() != carx || this.getY() != cary){
+            if(this.getX() != carx || this.getY() != cary){
              setLocation(carx , cary);
              dropped = true;
-            }
-            if(this.getX() - destination.x <0 ){
-                moverightbuild = true;
-            }
-            if(this.getY() - destination.y <0){
-                moveupbuild = true;
-            }
-        }
+             }
+            }}
+            
         
-    }
+    
 
 
     public void setColor(int colorIndex) {

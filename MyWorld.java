@@ -53,7 +53,7 @@ public class MyWorld extends World {
 
     static final int[] TILE_TYPE_CLIENT_DESTINATIONS = { TILE_TYPE_CLIENT_0_DESTINATION, TILE_TYPE_CLIENT_1_DESTINATION,
             TILE_TYPE_CLIENT_2_DESTINATION, TILE_TYPE_CLIENT_3_DESTINATION };
-
+    
     private Actor clock = new Actor() {
     };
     private int clockTime = 50;
@@ -104,7 +104,9 @@ public class MyWorld extends World {
     // client (0, 1, 2 or 3)
     int buildingX;
     int buildingY; 
-    Position destination;
+    int destinationX;
+    int destinationY;
+    
     
     public MyWorld() {
         // Create a new world with X by Y cells with a cell size of S pixels.
@@ -306,17 +308,19 @@ public class MyWorld extends World {
 
             // If we dropped of a client, count it
             if (dropOffClient) {
-                while(tiles[buildingX][buildingY] != TILE_TYPE_CLIENT_0_DESTINATION + clients[clientInTheCar].color){
                     buildingX = Greenfoot.getRandomNumber(N_TILE - 1);
                     buildingY = Greenfoot.getRandomNumber(N_TILE - 1);
-                    destination = getTilePosition(buildingX, buildingY);
-                 };
+                while(tiles[buildingX][buildingY] != TILE_TYPE_CLIENT_DESTINATIONS[clientInTheCar]){
+                    buildingX = Greenfoot.getRandomNumber(N_TILE - 1);
+                    buildingY = Greenfoot.getRandomNumber(N_TILE - 1);
+                };
+                destinationX = buildingX* TILE_SIZE;
+                destinationY = buildingY * TILE_SIZE;
+                System.out.println("destinationx " + destinationX);
+                System.out.println("destinationy " + destinationY);
                 clients[clientInTheCar].dropOff(carPosition.x, carPosition.y);
                 droppedOffClients++;
                 
-                
-                
-
                 clientInTheCar = -1;
             }
             clientScore.setImage(new GreenfootImage("Client score: " + Integer.toString(droppedOffClients), 20,
@@ -396,6 +400,7 @@ public class MyWorld extends World {
         boolean r = false;
         try {
             if (tiles[carPosition.x + xValue][carPosition.y + yValue] == TILE_TYPE_CLIENT_DESTINATIONS[clientNumber]) {
+                
                 r = true;
             }
         }
@@ -405,6 +410,7 @@ public class MyWorld extends World {
 
         try {
             if (tiles[carPosition.x - xValue][carPosition.y - yValue] == TILE_TYPE_CLIENT_DESTINATIONS[clientNumber]) {
+                
                 r = true;
             }
         }
@@ -465,6 +471,7 @@ public class MyWorld extends World {
                             || tiles[x + 1][y] != TILE_TYPE_BUILDING || tiles[x - 1][y] != TILE_TYPE_BUILDING
                             || tiles[x][y+1] != TILE_TYPE_BUILDING|| tiles[x ][y-1] != TILE_TYPE_BUILDING)) {
                     tiles[x][y] = TILE_TYPE_CLIENT_DESTINATIONS[n];
+                    
 
                     drawDestination(x, y, n);
 
