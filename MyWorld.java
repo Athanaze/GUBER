@@ -56,7 +56,7 @@ public class MyWorld extends World {
     
     private Actor clock = new Actor() {
     };
-    private int clockTime = 5;
+    private int clockTime = 50;
     private int clockRegulator;
 
     private Actor clientScore = new Actor() {
@@ -715,7 +715,7 @@ public class MyWorld extends World {
                 int x = Greenfoot.getRandomNumber(N_TILE - 1);
                 int y = Greenfoot.getRandomNumber(N_TILE - 1);
                 // check if its a building not next to a crossing
-                if (checkTile(x -1 ,y)|| checkTile(x + 1,y) ||  checkTile(x, y+1) || checkTile(x, y-1) ) {
+                if (tiles[x][y] != TILE_TYPE_VERTICAL && tiles[x][y] != TILE_TYPE_HORIZONTAL && tiles[x][y] != TILE_TYPE_INTERSECTION && (checkTile(x -1 ,y)|| checkTile(x + 1,y) ||  checkTile(x, y+1) || checkTile(x, y-1) )) {
                     tiles[x][y] = TILE_TYPE_CLIENTS[i];
                     clients[i] = new Client();
                     clients[i].setColor(i);
