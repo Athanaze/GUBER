@@ -1,5 +1,4 @@
 # TODO
-+ Win screen for player 1
 + Improve timer mechanics
 + Add animations for oldLadies?
 + Replay button

@@ -111,21 +111,7 @@ public class MyWorld extends World {
     public MyWorld() {
         // Create a new world with X by Y cells with a cell size of S pixels.
         super(WORLD_X, WORLD_Y, WORLD_S);
-        StartScreen startScreen = new StartScreen();
 
-        addObject(startScreen, WORLD_X / 2, WORLD_Y / 2);
-        clock.setImage(new GreenfootImage("Time: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
-        clientScore.setImage(
-                new GreenfootImage("Client score: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
-
-        addObject(clock, CLOCK_X, CLOCK_Y);
-
-        addObject(clientScore, CLIENT_SCORE_X, CLIENT_SCORE_Y);
-
-        player2_Ammo.setImage(
-                new GreenfootImage("Old lady: " + player2Ammo, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
-
-        addObject(player2_Ammo, PLAYER2_AMMO_X, PLAYER2_AMMO_Y);
 
         for (int j = 0; j < N_TILE; j++) {
 
@@ -165,6 +151,22 @@ public class MyWorld extends World {
          * "nice" when the game is not yet running.
          */
         addObject(car, TILE_SIZE, TILE_SIZE);
+
+        StartScreen startScreen = new StartScreen();
+
+        addObject(startScreen, WORLD_X / 2, WORLD_Y / 2);
+        clock.setImage(new GreenfootImage("Time: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+        clientScore.setImage(
+                new GreenfootImage("Client score: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+
+        addObject(clock, CLOCK_X, CLOCK_Y);
+
+        addObject(clientScore, CLIENT_SCORE_X, CLIENT_SCORE_Y);
+
+        player2_Ammo.setImage(
+                new GreenfootImage("Old lady: " + player2Ammo, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+
+        addObject(player2_Ammo, PLAYER2_AMMO_X, PLAYER2_AMMO_Y);
 
     }
 
@@ -714,18 +716,25 @@ public class MyWorld extends World {
                 int x = Greenfoot.getRandomNumber(N_TILE - 1);
                 int y = Greenfoot.getRandomNumber(N_TILE - 1);
                 // check if its a building not next to a crossing
-                if (tiles[x][y] == TILE_TYPE_BUILDING && tiles[x - 1][y] != TILE_TYPE_CROSSING
-                        && tiles[x + 1][y] != TILE_TYPE_CROSSING && tiles[x][y - 1] != TILE_TYPE_CROSSING
-                        && tiles[x][y + 1] != TILE_TYPE_CROSSING) {
-                    tiles[x][y] = TILE_TYPE_CLIENTS[i];
-                    clients[i] = new Client();
-                    clients[i].setColor(i);
-                    addObject(clients[i], x * TILE_SIZE, y * TILE_SIZE);
-                    break;
+                if 
+                if (tiles[x][y] == TILE_TYPE_BUILDING &&
+                    tiles[x - 1][y] != TILE_TYPE_CROSSING &&
+                    tiles[x + 1][y] != TILE_TYPE_CROSSING &&
+                    tiles[x][y - 1] != TILE_TYPE_CROSSING &&
+                    tiles[x][y + 1] != TILE_TYPE_CROSSING){
+                        tiles[x][y] = TILE_TYPE_CLIENTS[i];
+                        clients[i] = new Client();
+                        clients[i].setColor(i);
+                        addObject(clients[i], x * TILE_SIZE, y * TILE_SIZE);
+                        break;
                 }
             }
             // clients[i].setLocation(tileX*TILE_SIZE + (TILE_SIZE/2), tileY*TILE_SIZE +
             // (TILE_SIZE/2));
         }
+    }
+    
+    private boolean checkTile(int x, int y){
+        return (tiles[x][y] == TILE_TYPE_HORIZONTAL || tiles[x][y] == TILE_TYPE_VERTICAL || tiles[x][y] == TILE_TYPE_CROSSING)
     }
 }
