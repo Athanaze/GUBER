@@ -1,5 +1,5 @@
 import greenfoot.*; // (World, Actor, GreenfootImage, Greenfoot and MouseInfo) 
-
+import java.util.List;
 public class MyWorld extends World {
     static final int WORLD_X = 800;
     static final int WORLD_Y = 800;
@@ -117,10 +117,14 @@ public class MyWorld extends World {
         clock.setImage(new GreenfootImage("Time: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
         clientScore.setImage(
                 new GreenfootImage("Client score: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+
         addObject(clock, CLOCK_X, CLOCK_Y);
+
         addObject(clientScore, CLIENT_SCORE_X, CLIENT_SCORE_Y);
+
         player2_Ammo.setImage(
-                new GreenfootImage("mémés: " + player2Ammo, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+                new GreenfootImage("Old lady: " + player2Ammo, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+
         addObject(player2_Ammo, PLAYER2_AMMO_X, PLAYER2_AMMO_Y);
 
         for (int j = 0; j < N_TILE; j++) {
@@ -172,7 +176,6 @@ public class MyWorld extends World {
             if (droppedOffClients == N_CLIENTS) {
                 gameOver = true;
             }
-            ;
             // Value is -1 if the car is not next to a client, and if it is, the value is
             // the client's number
             int carNextToClient = -1;
@@ -190,7 +193,6 @@ public class MyWorld extends World {
                         r = checkIfCarIsNextToClient(carPosition, true);
                         if (r != -1) {
                             carNextToClient = r;
-                            System.out.println(r);
                         }
                     }
 
@@ -282,16 +284,15 @@ public class MyWorld extends World {
                 runClock();
             }
 
-            if (playGameOver == true) {
+            if (playGameOver) {
                 GreenfootSound crash = new GreenfootSound("crash.wav");
                 if (!crashHasPlayed) {
                     crash.play();
                     crashHasPlayed = true;
                 }
-                ;
-
-                if (crashHasPlayed == true) {
-                    // gotta give time for the sound to play
+                // give time for the sound to play
+                if (crashHasPlayed) {
+                    
                     Greenfoot.delay(1000);
                     crash.stop();
                     playGameOver = false;
@@ -316,8 +317,6 @@ public class MyWorld extends World {
                 };
                 destinationX = buildingX* TILE_SIZE;
                 destinationY = buildingY * TILE_SIZE;
-                System.out.println("destinationx " + destinationX);
-                System.out.println("destinationy " + destinationY);
                 clients[clientInTheCar].dropOff(carPosition.x, carPosition.y);
                 droppedOffClients++;
                 
@@ -384,7 +383,6 @@ public class MyWorld extends World {
         // Just here to catch "out of bound" exceptions
         catch (Exception e) {
         }
-        showText("R : " + Integer.toString(r), 100, 100);
         return r;
     }
 
@@ -509,6 +507,11 @@ public class MyWorld extends World {
         }
 
     }
+
+    private void removeAllObjects(){
+        removeObjects(getObjects(null));
+    }
+
     // Stuff being drawn on the screen
 
     private void drawGameOver() {
@@ -526,9 +529,7 @@ public class MyWorld extends World {
                     GAME_OVER_BACKGROUND, GAME_OVER_OUTLINE);
             image.drawImage(g, (WORLD_X - g.getWidth()) / 2, (WORLD_Y - g.getHeight()) / 2);
         }
-        ;
-        // Draw the text at the center of the screen
-
+        removeAllObjects();
     }
 
     private void drawVerticalRoad(int i, int j) {

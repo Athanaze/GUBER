@@ -1,13 +1,10 @@
 # TODO
-+ AJOUTER LES OBJECTIFS DANS LE PROJET PLZ
-+ The sounds effects are buggy
-+ Make the client disapear when in the car
-
-+ Fancy animation when we drop off the client
 + Win screen for player 1
 + Improve timer mechanics
 + Add animations for oldLadies?
-
++ Replay button
++ BUG : Sometimes you cannot drop off the client
++ BUG : Fountain on top of the timer
 # Gameplay
 
 + Le joueur 1 conduit la voiture, et doit déposer ses covoiturés aux quatres points de la ville.
@@ -41,3 +38,14 @@
 
 + Invocation des Vieilles à la souris. (On ne peut invoquer des vieilles que sur les passages piétons)
 
+# Sons
+
+La majorité des effets sonores ont été enregistré par nous-mêmes.
+
+Certains effets ont été créés par des tiers. Ceux-ci sont listés ici conformément à leur licence (<https://www.zapsplat.com/license-type/standard-license/>)
+
+Sound effects obtained from <https://www.zapsplat.com>:
+
+"zapsplat_multimedia_game_tone_advance_proceed_synth_delayed_46034.mp3" : <https://www.zapsplat.com/music/synthesized-game-tone-advance-proceed/>
+
+"zapsplat_impact_crash_metal_and_glass_hard_001_32183.mp3" : <https://www.zapsplat.com/music/impact-hard-crash-metal-and-glass-1/>
