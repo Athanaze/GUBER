@@ -56,7 +56,7 @@ public class MyWorld extends World {
     
     private Actor clock = new Actor() {
     };
-    private int clockTime = 50;
+    private int clockTime = 5;
     private int clockRegulator;
 
     private Actor clientScore = new Actor() {
@@ -276,16 +276,15 @@ public class MyWorld extends World {
             }
             player2Cooldown--;
 
+            // update clock
+            runClock();
+
             if (gameOver) {
                 removeObject(car);
                 drawGameOver();
                 playGameOver = true;
 
-            } else {
-                // update clock
-                runClock();
             }
-
             if (playGameOver) {
                 GreenfootSound crash = new GreenfootSound("crash.wav");
                 if (!crashHasPlayed) {
