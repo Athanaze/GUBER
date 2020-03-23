@@ -1,5 +1,9 @@
 import greenfoot.*; // (World, Actor, GreenfootImage, Greenfoot and MouseInfo) 
 import java.util.List;
+import java.util.Scanner;
+import java.io.*;
+import java.io.FileWriter;
+
 public class MyWorld extends World {
     static final int WORLD_X = 800;
     static final int WORLD_Y = 800;
@@ -53,16 +57,13 @@ public class MyWorld extends World {
 
     static final int[] TILE_TYPE_CLIENT_DESTINATIONS = { TILE_TYPE_CLIENT_0_DESTINATION, TILE_TYPE_CLIENT_1_DESTINATION,
             TILE_TYPE_CLIENT_2_DESTINATION, TILE_TYPE_CLIENT_3_DESTINATION };
-    
-    private Actor clock = new Actor() {
-    };
+
+    private Actor clock=new Actor(){};
     private int clockTime = 5;
     private int clockRegulator;
 
-    private Actor clientScore = new Actor() {
-    };
-    private Actor player2_Ammo = new Actor() {
-    };
+    private Actor clientScore=new Actor(){};
+    private Actor player2_Ammo=new Actor(){};
     static final int CLOCK_X = 75;
     static final int CLOCK_Y = 40;
 
@@ -85,6 +86,11 @@ public class MyWorld extends World {
     int player2Ammo = 5;
     // should be the same as oldlady life duration
     int player2Cooldown = OldLady.LIFE_DURATION;
+    
+    private Actor statsActor = new Actor() {};
+    static final int STATS_X = 500;
+    static final int STATS_Y = 100;
+    static final String STATS_FILE = "stats.csv";
 
     boolean gameOver = false;
     // 0 for crash, 1 for rolling on a grandMa, 2 for out of time, 3 for P1 wins
@@ -105,16 +111,14 @@ public class MyWorld extends World {
     int clientInTheCar = -1; // -1 when there is nobody in the car, otherwise is equal to the number of the
     // client (0, 1, 2 or 3)
     int buildingX;
-    int buildingY; 
+    int buildingY;
     int destinationX;
     int destinationY;
     boolean drawDisplay = true;
-    
-    
+
     public MyWorld() {
         // Create a new world with X by Y cells with a cell size of S pixels.
         super(WORLD_X, WORLD_Y, WORLD_S);
-
 
         for (int j = 0; j < N_TILE; j++) {
 
@@ -158,26 +162,86 @@ public class MyWorld extends World {
         StartScreen startScreen = new StartScreen();
 
         addObject(startScreen, WORLD_X / 2, WORLD_Y / 2);
-        
 
+        // Read and show the stats
+        showStats(readStats());
+    }
+
+    
+    // Statistic stuff
+    private int[] readStats() {
+        int[] scoreArr = { -1, -1 };
+        try {
+            File myObj = new File(STATS_FILE);
+            Scanner myReader = new Scanner(myObj);
+            boolean first = true;
+
+            while (myReader.hasNextLine()) {
+                if (first) {
+                    scoreArr[0] = Integer.parseInt(myReader.nextLine());
+                    first = false;
+                } else {
+                    scoreArr[1] = Integer.parseInt(myReader.nextLine());
+                }
+            }
+            myReader.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("An error occurred. Could not read the stats from the file");
+            e.printStackTrace();
+        }
+        return scoreArr;
+    }
+
+    private void showStats(int[] scoreArr) {
+        if (scoreArr[0] == -1 && scoreArr[1] == -1) {
+            statsActor.setImage(new GreenfootImage("No stats yet. Play some games to see interesting data !", 20,
+                    greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+        } else {
+            float totalGame = (float) (scoreArr[0] + scoreArr[1]);
+
+            float percent_win_player_1 = (scoreArr[0] / totalGame) * 100;
+            float percent_win_player_2 = (scoreArr[1] / totalGame) * 100;
+
+            percent_win_player_1 = Math.round(percent_win_player_1 * 100.0) / 100.0f;
+            percent_win_player_2 = Math.round(percent_win_player_2 * 100.0) / 100.0f;
+
+            statsActor.setImage(new GreenfootImage(
+                    "Player 1 won " + String.valueOf(percent_win_player_1) + " % of games \n Player 2 won "
+                            + String.valueOf(percent_win_player_2) + " % of games",
+                    20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+
+        }
+        addObject(statsActor, STATS_X, STATS_Y);
+    }
+
+    private void writeNewScores(int[] scoreArr) {
+        try {
+            FileWriter myWriter = new FileWriter(STATS_FILE);
+            myWriter.write(Integer.toString(scoreArr[0]) + "\n" + Integer.toString(scoreArr[1]));
+            myWriter.close();
+        } catch (IOException e) {
+            System.out.println("An error occurred. Could not write the new scores to the file");
+            e.printStackTrace();
+        }
     }
 
     public void act() {
         // to play gameover sound for oldlady
         boolean gameOverLady = car.gameOverLady;
-        if(drawDisplay){clock.setImage(new GreenfootImage("Time: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
-        clientScore.setImage(
-                new GreenfootImage("Client score: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+        if (drawDisplay) {
+            clock.setImage(new GreenfootImage("Time: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+            clientScore.setImage(
+                    new GreenfootImage("Client score: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
 
-        addObject(clock, CLOCK_X, CLOCK_Y);
+            addObject(clock, CLOCK_X, CLOCK_Y);
 
-        addObject(clientScore, CLIENT_SCORE_X, CLIENT_SCORE_Y);
+            addObject(clientScore, CLIENT_SCORE_X, CLIENT_SCORE_Y);
 
-        player2_Ammo.setImage(
-                new GreenfootImage("Old lady: " + player2Ammo, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+            player2_Ammo.setImage(
+                    new GreenfootImage("Old lady: " + player2Ammo, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
 
-        addObject(player2_Ammo, PLAYER2_AMMO_X, PLAYER2_AMMO_Y);
-        drawDisplay = false;
+            addObject(player2_Ammo, PLAYER2_AMMO_X, PLAYER2_AMMO_Y);
+            drawDisplay = false;
         }
         if (getObjects(StartScreen.class).size() == 0) {
             // Player 1
@@ -186,7 +250,7 @@ public class MyWorld extends World {
             if (droppedOffClients == N_CLIENTS) {
                 gameOverType = 3;
                 gameOver = true;
-                
+
             }
             // Value is -1 if the car is not next to a client, and if it is, the value is
             // the client's number
@@ -252,7 +316,7 @@ public class MyWorld extends World {
                     break;
 
                 case TILE_TYPE_OLD_LADY:
-                    
+
                     gameOver = true;
                     break;
             }
@@ -295,62 +359,82 @@ public class MyWorld extends World {
             if (gameOver) {
                 removeObject(car);
                 drawGameOver();
-                if (gameOverLady){
-                gameOverType = 1;}
+                if (gameOverLady) {
+                    gameOverType = 1;
+                }
                 playGameOver = true;
-                
-            
+
             }
-            if (playGameOver) {switch( gameOverType){
-                case 0 : GreenfootSound crash = new GreenfootSound("crash.wav");
+            if (playGameOver) {
+                int[] rStats=readStats();
+                switch (gameOverType) {
+                    case 0:
+                        GreenfootSound crash = new GreenfootSound("crash.wav");
                         if (!soundHasPlayed) {
-                    crash.play();
-                    soundHasPlayed = true;
-                }
-                if (soundHasPlayed) {
-                    
-                    Greenfoot.delay(1000);
-                    crash.stop();
-                    playGameOver = false;
-                }
-                case 1 : GreenfootSound ladyKilled = new GreenfootSound("old_lady_killed.wav");
+                            crash.play();
+                            soundHasPlayed = true;
+                        }
+                        if (soundHasPlayed) {
+
+                            Greenfoot.delay(1000);
+                            crash.stop();
+                            playGameOver = false;
+                        }
+                        
+                        
+                        rStats[1]++;
+                        writeNewScores(rStats);
+                        break;
+                    case 1:
+                        GreenfootSound ladyKilled = new GreenfootSound("old_lady_killed.wav");
                         if (!soundHasPlayed) {
-                    ladyKilled.play();
-                    soundHasPlayed = true;
-                }
-                if (soundHasPlayed) {
-                    
-                    Greenfoot.delay(1000);
-                    ladyKilled.stop();
-                    playGameOver = false;
-                }
-                case 2 : GreenfootSound timeOut = new GreenfootSound("hop.wav");
+                            ladyKilled.play();
+                            soundHasPlayed = true;
+                        }
+                        if (soundHasPlayed) {
+
+                            Greenfoot.delay(1000);
+                            ladyKilled.stop();
+                            playGameOver = false;
+                        }
+                        rStats[1]++;
+                        writeNewScores(rStats);
+                        break;
+
+                    case 2:
+                        GreenfootSound timeOut = new GreenfootSound("game_over_old_lady.wav");
                         if (!soundHasPlayed) {
-                    timeOut.play();
-                    soundHasPlayed = true;
-                }
-                if (soundHasPlayed) {
-                    
-                    Greenfoot.delay(1000);
-                    timeOut.stop();
-                    playGameOver = false;
-                }
-                case 3 : GreenfootSound guberWins = new GreenfootSound("hopop.wav");
+                            timeOut.play();
+                            soundHasPlayed = true;
+                        }
+                        if (soundHasPlayed) {
+
+                            Greenfoot.delay(1000);
+                            timeOut.stop();
+                            playGameOver = false;
+                        }
+                        rStats[1]++;
+                        writeNewScores(rStats);
+                        break;
+
+                    case 3:
+                        GreenfootSound guberWins = new GreenfootSound("guber_win.wav");
                         if (!soundHasPlayed) {
-                    guberWins.play();
-                    soundHasPlayed = true;
+                            guberWins.play();
+                            soundHasPlayed = true;
+                        }
+                        if (soundHasPlayed) {
+
+                            Greenfoot.delay(1000);
+                            guberWins.stop();
+                            playGameOver = false;
+                        }
+                        rStats[0]++;
+                        writeNewScores(rStats);
+                        break;
                 }
-                if (soundHasPlayed) {
-                    
-                    Greenfoot.delay(1000);
-                    guberWins.stop();
-                    playGameOver = false;
-                }
-            }
-                
-                
+
                 // give time for the sound to play
-                
 
             }
             // If the car is next to a client, get the client in the car
@@ -363,17 +447,18 @@ public class MyWorld extends World {
 
             // If we dropped of a client, count it
             if (dropOffClient) {
+                buildingX = Greenfoot.getRandomNumber(N_TILE - 1);
+                buildingY = Greenfoot.getRandomNumber(N_TILE - 1);
+                while (tiles[buildingX][buildingY] != TILE_TYPE_CLIENT_DESTINATIONS[clientInTheCar]) {
                     buildingX = Greenfoot.getRandomNumber(N_TILE - 1);
                     buildingY = Greenfoot.getRandomNumber(N_TILE - 1);
-                while(tiles[buildingX][buildingY] != TILE_TYPE_CLIENT_DESTINATIONS[clientInTheCar]){
-                    buildingX = Greenfoot.getRandomNumber(N_TILE - 1);
-                    buildingY = Greenfoot.getRandomNumber(N_TILE - 1);
-                };
-                destinationX = buildingX* TILE_SIZE;
+                }
+                ;
+                destinationX = buildingX * TILE_SIZE;
                 destinationY = buildingY * TILE_SIZE;
                 clients[clientInTheCar].dropOff(carPosition.x, carPosition.y);
                 droppedOffClients++;
-                
+
                 clientInTheCar = -1;
             }
             clientScore.setImage(new GreenfootImage("Client score: " + Integer.toString(droppedOffClients), 20,
@@ -452,7 +537,7 @@ public class MyWorld extends World {
         boolean r = false;
         try {
             if (tiles[carPosition.x + xValue][carPosition.y + yValue] == TILE_TYPE_CLIENT_DESTINATIONS[clientNumber]) {
-                
+
                 r = true;
             }
         }
@@ -462,7 +547,7 @@ public class MyWorld extends World {
 
         try {
             if (tiles[carPosition.x - xValue][carPosition.y - yValue] == TILE_TYPE_CLIENT_DESTINATIONS[clientNumber]) {
-                
+
                 r = true;
             }
         }
@@ -514,45 +599,41 @@ public class MyWorld extends World {
             int x = Greenfoot.getRandomNumber(N_TILE - 1);
             int y = Greenfoot.getRandomNumber(N_TILE - 1);
 
-            if ((tiles[x][y] == TILE_TYPE_GRASS))
-                     {
+            if ((tiles[x][y] == TILE_TYPE_GRASS)) {
 
                 // The first 4 buildings are set as destination
-                if ((n < N_CLIENTS)&& (tiles[x - 1][y] != TILE_TYPE_GRASS || tiles[x + 1][y] != TILE_TYPE_GRASS
-                            || tiles[x ][y+1] != TILE_TYPE_GRASS || tiles[x][y-1] != TILE_TYPE_GRASS
-                            || tiles[x + 1][y] != TILE_TYPE_BUILDING || tiles[x - 1][y] != TILE_TYPE_BUILDING
-                            || tiles[x][y+1] != TILE_TYPE_BUILDING|| tiles[x ][y-1] != TILE_TYPE_BUILDING)) {
+                if ((n < N_CLIENTS) && (tiles[x - 1][y] != TILE_TYPE_GRASS || tiles[x + 1][y] != TILE_TYPE_GRASS
+                        || tiles[x][y + 1] != TILE_TYPE_GRASS || tiles[x][y - 1] != TILE_TYPE_GRASS
+                        || tiles[x + 1][y] != TILE_TYPE_BUILDING || tiles[x - 1][y] != TILE_TYPE_BUILDING
+                        || tiles[x][y + 1] != TILE_TYPE_BUILDING || tiles[x][y - 1] != TILE_TYPE_BUILDING)) {
                     tiles[x][y] = TILE_TYPE_CLIENT_DESTINATIONS[n];
-                    
 
                     drawDestination(x, y, n);
 
                 } else {
                     tiles[x][y] = TILE_TYPE_BUILDING;
-                    if(n % 2 == 0){
+                    if (n % 2 == 0) {
                         drawBuilding(x, y);
-                    }
-                    else{
-                        if(n % 3 == 0){
+                    } else {
+                        if (n % 3 == 0) {
                             int r = Greenfoot.getRandomNumber(3);
-                            switch(r){
+                            switch (r) {
                                 case 0:
-                                    drawFountain(x,y);
+                                    drawFountain(x, y);
                                     break;
                                 case 1:
-                                    drawTree(x,y);
+                                    drawTree(x, y);
                                     break;
                                 case 2:
                                     drawHelicopterPad(x, y);
                                     break;
                             }
-                        }
-                        else{
+                        } else {
                             drawBuilding2(x, y);
                         }
-                        
+
                     }
-                    
+
                 }
 
                 n--;
@@ -562,7 +643,7 @@ public class MyWorld extends World {
 
     }
 
-    private void removeAllObjects(){
+    private void removeAllObjects() {
         removeObjects(getObjects(null));
     }
 
@@ -651,36 +732,34 @@ public class MyWorld extends World {
         int y = j * TILE_SIZE;
 
         GreenfootImage image = getBackground();
-        int lgrayVariation = LIGHT_GRAY+Greenfoot.getRandomNumber(GRAY_VARIATION);
+        int lgrayVariation = LIGHT_GRAY + Greenfoot.getRandomNumber(GRAY_VARIATION);
         image.setColor(new Color(lgrayVariation, lgrayVariation, lgrayVariation));
 
         image.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-        int dgrayVariation = DARK_GRAY+Greenfoot.getRandomNumber(GRAY_VARIATION);
+        int dgrayVariation = DARK_GRAY + Greenfoot.getRandomNumber(GRAY_VARIATION);
         image.setColor(new Color(dgrayVariation, dgrayVariation, dgrayVariation));
 
-        image.fillRect(
-                x + BUILDING_BORDER_SIZE,
-                y + BUILDING_BORDER_SIZE,
-                TILE_SIZE - (2*BUILDING_BORDER_SIZE),
-                TILE_SIZE - (2*BUILDING_BORDER_SIZE)
-                );
+        image.fillRect(x + BUILDING_BORDER_SIZE, y + BUILDING_BORDER_SIZE, TILE_SIZE - (2 * BUILDING_BORDER_SIZE),
+                TILE_SIZE - (2 * BUILDING_BORDER_SIZE));
     }
-    // A fountain is also a "building", it's just a different representation of the same concept (another view of the same model)
+
+    // A fountain is also a "building", it's just a different representation of the
+    // same concept (another view of the same model)
     private void drawFountain(int i, int j) {
         Building_image fountain = new Building_image();
-        addObject(fountain, (i*TILE_SIZE)+BUILDING_IMAGE_OFFSET, (j*TILE_SIZE)+BUILDING_IMAGE_OFFSET);
+        addObject(fountain, (i * TILE_SIZE) + BUILDING_IMAGE_OFFSET, (j * TILE_SIZE) + BUILDING_IMAGE_OFFSET);
     }
 
     private void drawTree(int i, int j) {
         Building_image tree = new Building_image();
         tree.setImage("tree.png");
-        addObject(tree, (i*TILE_SIZE)+BUILDING_IMAGE_OFFSET, (j*TILE_SIZE)+BUILDING_IMAGE_OFFSET);
+        addObject(tree, (i * TILE_SIZE) + BUILDING_IMAGE_OFFSET, (j * TILE_SIZE) + BUILDING_IMAGE_OFFSET);
     }
 
     private void drawHelicopterPad(int i, int j) {
         Building_image heli = new Building_image();
         heli.setImage("helicopter_pad.png");
-        addObject(heli, (i*TILE_SIZE)+BUILDING_IMAGE_OFFSET, (j*TILE_SIZE)+BUILDING_IMAGE_OFFSET);
+        addObject(heli, (i * TILE_SIZE) + BUILDING_IMAGE_OFFSET, (j * TILE_SIZE) + BUILDING_IMAGE_OFFSET);
     }
 
     private void drawDestination(int i, int j, int colorIndex) {
@@ -747,7 +826,7 @@ public class MyWorld extends World {
         GreenfootImage sprite = new GreenfootImage("car.png");
         sprite.scale(TILE_SIZE, TILE_SIZE);
         image.drawImage(sprite, x, y);
-        
+
     }
 
     private void runClock() {
@@ -763,13 +842,15 @@ public class MyWorld extends World {
         }
     }
 
-     private void placeClients() {
+    private void placeClients() {
         for (int i = 0; i < 4; i++) {
             while (true) {
                 int x = Greenfoot.getRandomNumber(N_TILE - 1);
                 int y = Greenfoot.getRandomNumber(N_TILE - 1);
                 // check if its a building not next to a crossing
-                if (tiles[x][y] != TILE_TYPE_VERTICAL && tiles[x][y] != TILE_TYPE_HORIZONTAL && tiles[x][y] != TILE_TYPE_INTERSECTION && (checkTile(x -1 ,y)|| checkTile(x + 1,y) ||  checkTile(x, y+1) || checkTile(x, y-1) )) {
+                if (tiles[x][y] != TILE_TYPE_VERTICAL && tiles[x][y] != TILE_TYPE_HORIZONTAL
+                        && tiles[x][y] != TILE_TYPE_INTERSECTION
+                        && (checkTile(x - 1, y) || checkTile(x + 1, y) || checkTile(x, y + 1) || checkTile(x, y - 1))) {
                     tiles[x][y] = TILE_TYPE_CLIENTS[i];
                     clients[i] = new Client();
                     clients[i].setColor(i);
@@ -779,20 +860,18 @@ public class MyWorld extends World {
             }
             // clients[i].setLocation(tileX*TILE_SIZE + (TILE_SIZE/2), tileY*TILE_SIZE +
             // (TILE_SIZE/2));
-        
-    
-             
+
         }
     }
-    
+
     // Return true if the tile is of the correct type
-    private boolean checkTile(int x, int y){
+    private boolean checkTile(int x, int y) {
         boolean r;
-        if(x <= 0 || y <=0){
+        if (x <= 0 || y <= 0) {
             r = false;
-        }
-        else{
-            r = (tiles[x][y] == TILE_TYPE_HORIZONTAL || tiles[x][y] == TILE_TYPE_VERTICAL || tiles[x][y] == TILE_TYPE_CROSSING);
+        } else {
+            r = (tiles[x][y] == TILE_TYPE_HORIZONTAL || tiles[x][y] == TILE_TYPE_VERTICAL
+                    || tiles[x][y] == TILE_TYPE_CROSSING);
         }
         return r;
     }
