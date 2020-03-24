@@ -60,7 +60,7 @@ public class MyWorld extends World {
 
     private Actor clock = new Actor() {
     };
-    private int clockTime = 5;
+    private int clockTime = 60;
     private int clockRegulator;
 
     private Actor clientScore = new Actor() {
@@ -92,8 +92,8 @@ public class MyWorld extends World {
 
     private Actor statsActor = new Actor() {
     };
-    static final int STATS_X = 500;
-    static final int STATS_Y = 100;
+    static final int STATS_X = 400;
+    static final int STATS_Y = 200;
     static final String STATS_FILE = "stats.guber";
 
     static final int SOUND_DELAY = 1000;
@@ -235,6 +235,7 @@ public class MyWorld extends World {
 
     public void act() {
         // to play gameover sound for oldlady
+        removeObject(statsActor);
         boolean gameOverLady = car.gameOverLady;
         if (drawDisplay) {
             clock.setImage(new GreenfootImage("Time: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
