@@ -1,3 +1,4 @@
+// A simple class to hold position data
 public class Position{
     
     public int x;

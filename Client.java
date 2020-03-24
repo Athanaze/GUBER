@@ -1,51 +1,33 @@
 import greenfoot.*; // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
 import java.util.List;
+// The Actor used to represent the client in the game
+// This class also contains the animation for the client entering the car
 
 public class Client extends Actor {
     static final int WORLD_X = 800;
     static final int WORLD_Y = 800;
-    static final int WORLD_S = 1;
 
     static final int N_TILE = 40;
     public static final int TILE_SIZE = WORLD_X / N_TILE;
 
-    static final int ROAD_BLACKNESS = 128;
-
-    static final Color TILE_ROAD_COLOR = new Color(ROAD_BLACKNESS, ROAD_BLACKNESS, ROAD_BLACKNESS);
-    static final Color TILE_GRASS_COLOR = new Color(10, 255, 0);
-    static final Color TILE_BUILDING_COLOR = new Color(255, 204, 102);
-    static final Color TILE_CROSSING_COLOR = new Color(255, 255, 0);
-    static final int N_TYPES = 3;
-    // Must be divisible by 2
-    static final int ROAD_TO_GRASS_RATIO = 4;
-
-    static final int N_CROSSING_BANDS = 4;
-    static final int CROSSING_BANDS_WIDTH = TILE_SIZE / (N_CROSSING_BANDS * 2);
-
-    static final int TILE_TYPE_BUILDING = 0;
-    static final int TILE_TYPE_VERTICAL = 1;
-    static final int TILE_TYPE_HORIZONTAL = 2;
-    static final int TILE_TYPE_CROSSING = 3;
-    static final int TILE_TYPE_OLD_LADY = 4;
-    static final int TILE_TYPE_CAR = 5;
+    // Used to do the animation
     boolean moveright = false;
-    
     boolean moveup = false;
-    
     boolean moveupbuild;
     boolean moverightbuild;
-    
+
     int color;
-    
+
     boolean dropped = false;
+
     public void act() {
         GreenfootImage image = getImage();
         image.scale(TILE_SIZE, TILE_SIZE);
         List cars = getWorld().getObjects(Car.class);
         int positionx = getX();
         int positiony = getY();
-        
-        if (moveup == true) {
+
+        if (moveup) {
             if (!cars.isEmpty()) {
                 Actor Car = (Actor) cars.get(0);
                 int cary = Car.getY();
@@ -63,7 +45,7 @@ public class Client extends Actor {
                 setImage(image);
             }
         }
-        if (moveright == true) {
+        if (moveright) {
             if (!cars.isEmpty()) {
                 Actor Car = (Actor) cars.get(0);
                 int carx = Car.getX();
@@ -83,31 +65,32 @@ public class Client extends Actor {
                 setImage(image);
             }
         }
-        if(dropped == true){
+        if (dropped) {
             int destinationX = ((MyWorld) getWorld()).destinationX;
             int destinationY = ((MyWorld) getWorld()).destinationY;
-            if(positionx == destinationX && positiony == destinationY){
+            if (positionx == destinationX && positiony == destinationY) {
                 image.clear();
                 setImage(image);
                 dropped = false;
-                }
-            if(positionx == destinationX){}
-                else if( destinationX - positionx < 0){
-                
-                setLocation(positionx -1 , positiony);}
-                else{setLocation(positionx +1 , positiony);}
-            if(positiony == destinationY){}
-            else if( destinationY - positiony < 0){
-                
-                setLocation(positionx  , positiony-1);}
-            else{setLocation(positionx  , positiony+1);}
             }
+            if (positionx == destinationX) {
+            } else if (destinationX - positionx < 0) {
+
+                setLocation(positionx - 1, positiony);
+            } else {
+                setLocation(positionx + 1, positiony);
+            }
+            if (positiony == destinationY) {
+            } else if (destinationY - positiony < 0) {
+
+                setLocation(positionx, positiony - 1);
+            } else {
+                setLocation(positionx, positiony + 1);
+            }
+        }
     }
 
     public void getInTheCar() {
-        // TODO : fancy animation
-        // For now, we just make him invisible right away
-
         Greenfoot.playSound("hop.wav");
         List cars = getWorld().getObjects(Car.class);
         if (!cars.isEmpty()) {
@@ -131,22 +114,17 @@ public class Client extends Actor {
         Greenfoot.playSound("success.wav");
         setColor(color);
         List cars = getWorld().getObjects(Car.class);
-        
-        
-        
+
         if (!cars.isEmpty()) {
             Actor Car = (Actor) cars.get(0);
             int carx = Car.getX();
             int cary = Car.getY();
-            if(this.getX() != carx || this.getY() != cary){
-             setLocation(carx , cary);
-             dropped = true;
-             }
-            }}
-            
-        
-    
-
+            if (this.getX() != carx || this.getY() != cary) {
+                setLocation(carx, cary);
+                dropped = true;
+            }
+        }
+    }
 
     public void setColor(int colorIndex) {
         setImage("client" + Integer.toString(colorIndex) + ".png");

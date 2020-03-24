@@ -6,7 +6,6 @@ public class Building_image extends Actor
 {
     static final int WORLD_X = 800;
     static final int WORLD_Y = 800;
-    static final int WORLD_S = 1;
 
     static final int N_TILE = 40;
     public static final int TILE_SIZE = WORLD_X / N_TILE;

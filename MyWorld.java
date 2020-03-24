@@ -58,12 +58,15 @@ public class MyWorld extends World {
     static final int[] TILE_TYPE_CLIENT_DESTINATIONS = { TILE_TYPE_CLIENT_0_DESTINATION, TILE_TYPE_CLIENT_1_DESTINATION,
             TILE_TYPE_CLIENT_2_DESTINATION, TILE_TYPE_CLIENT_3_DESTINATION };
 
-    private Actor clock=new Actor(){};
+    private Actor clock = new Actor() {
+    };
     private int clockTime = 5;
     private int clockRegulator;
 
-    private Actor clientScore=new Actor(){};
-    private Actor player2_Ammo=new Actor(){};
+    private Actor clientScore = new Actor() {
+    };
+    private Actor player2_Ammo = new Actor() {
+    };
     static final int CLOCK_X = 75;
     static final int CLOCK_Y = 40;
 
@@ -86,15 +89,21 @@ public class MyWorld extends World {
     int player2Ammo = 5;
     // should be the same as oldlady life duration
     int player2Cooldown = OldLady.LIFE_DURATION;
-    
-    private Actor statsActor = new Actor() {};
+
+    private Actor statsActor = new Actor() {
+    };
     static final int STATS_X = 500;
     static final int STATS_Y = 100;
-    static final String STATS_FILE = "stats.csv";
+    static final String STATS_FILE = "stats.guber";
+
+    static final int SOUND_DELAY = 1000;
 
     boolean gameOver = false;
-    // 0 for crash, 1 for rolling on a grandMa, 2 for out of time, 3 for P1 wins
     int gameOverType;
+    static final int GAME_OVER_TYPE_CRASH = 0;
+    static final int GAME_OVER_TYPE_KILLED_OLD_LADY = 1;
+    static final int GAME_OVER_TYPE_OUT_OF_TIME = 2;
+    static final int GAME_OVER_TYPE_PLAYER_1_WON = 3;
     boolean playGameOver = false;
     boolean soundHasPlayed = false;
 
@@ -167,7 +176,6 @@ public class MyWorld extends World {
         showStats(readStats());
     }
 
-    
     // Statistic stuff
     private int[] readStats() {
         int[] scoreArr = { -1, -1 };
@@ -248,7 +256,7 @@ public class MyWorld extends World {
             Position carPosition = car.getPosition();
             // makes P1 wins when he dropped every client;
             if (droppedOffClients == N_CLIENTS) {
-                gameOverType = 3;
+                gameOverType = GAME_OVER_TYPE_PLAYER_1_WON;
                 gameOver = true;
 
             }
@@ -306,12 +314,12 @@ public class MyWorld extends World {
                     break;
 
                 case TILE_TYPE_BUILDING:
-                    gameOverType = 0;
+                    gameOverType = GAME_OVER_TYPE_CRASH;
                     gameOver = true;
                     break;
 
                 case TILE_TYPE_GRASS:
-                    gameOverType = 0;
+                    gameOverType = GAME_OVER_TYPE_CRASH;
                     gameOver = true;
                     break;
 
@@ -360,15 +368,15 @@ public class MyWorld extends World {
                 removeObject(car);
                 drawGameOver();
                 if (gameOverLady) {
-                    gameOverType = 1;
+                    gameOverType = GAME_OVER_TYPE_KILLED_OLD_LADY;
                 }
                 playGameOver = true;
 
             }
             if (playGameOver) {
-                int[] rStats=readStats();
+                int[] rStats = readStats();
                 switch (gameOverType) {
-                    case 0:
+                    case GAME_OVER_TYPE_CRASH:
                         GreenfootSound crash = new GreenfootSound("crash.wav");
                         if (!soundHasPlayed) {
                             crash.play();
@@ -376,16 +384,15 @@ public class MyWorld extends World {
                         }
                         if (soundHasPlayed) {
 
-                            Greenfoot.delay(1000);
+                            Greenfoot.delay(SOUND_DELAY);
                             crash.stop();
                             playGameOver = false;
                         }
-                        
-                        
+
                         rStats[1]++;
                         writeNewScores(rStats);
                         break;
-                    case 1:
+                    case GAME_OVER_TYPE_KILLED_OLD_LADY:
                         GreenfootSound ladyKilled = new GreenfootSound("old_lady_killed.wav");
                         if (!soundHasPlayed) {
                             ladyKilled.play();
@@ -393,7 +400,7 @@ public class MyWorld extends World {
                         }
                         if (soundHasPlayed) {
 
-                            Greenfoot.delay(1000);
+                            Greenfoot.delay(SOUND_DELAY);
                             ladyKilled.stop();
                             playGameOver = false;
                         }
@@ -401,7 +408,7 @@ public class MyWorld extends World {
                         writeNewScores(rStats);
                         break;
 
-                    case 2:
+                    case GAME_OVER_TYPE_OUT_OF_TIME:
                         GreenfootSound timeOut = new GreenfootSound("game_over_old_lady.wav");
                         if (!soundHasPlayed) {
                             timeOut.play();
@@ -409,7 +416,7 @@ public class MyWorld extends World {
                         }
                         if (soundHasPlayed) {
 
-                            Greenfoot.delay(1000);
+                            Greenfoot.delay(SOUND_DELAY);
                             timeOut.stop();
                             playGameOver = false;
                         }
@@ -417,7 +424,7 @@ public class MyWorld extends World {
                         writeNewScores(rStats);
                         break;
 
-                    case 3:
+                    case GAME_OVER_TYPE_PLAYER_1_WON:
                         GreenfootSound guberWins = new GreenfootSound("guber_win.wav");
                         if (!soundHasPlayed) {
                             guberWins.play();
@@ -425,7 +432,7 @@ public class MyWorld extends World {
                         }
                         if (soundHasPlayed) {
 
-                            Greenfoot.delay(1000);
+                            Greenfoot.delay(SOUND_DELAY);
                             guberWins.stop();
                             playGameOver = false;
                         }
@@ -464,7 +471,7 @@ public class MyWorld extends World {
             clientScore.setImage(new GreenfootImage("Client score: " + Integer.toString(droppedOffClients), 20,
                     greenfoot.Color.BLACK, greenfoot.Color.WHITE));
             player2_Ammo.setImage(
-                    new GreenfootImage("mémés: " + player2Ammo, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+                    new GreenfootImage("Old lady: " + player2Ammo, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
         }
     }
 
@@ -638,7 +645,7 @@ public class MyWorld extends World {
 
                 n--;
             }
-            ;
+            
         }
 
     }
@@ -835,7 +842,7 @@ public class MyWorld extends World {
             clockTime--;
             clock.setImage(new GreenfootImage("Time: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
             if (clockTime < 0) {
-                gameOverType = 2;
+                gameOverType = GAME_OVER_TYPE_OUT_OF_TIME;
                 gameOver = true;
             }
 

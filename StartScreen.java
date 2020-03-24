@@ -1,17 +1,13 @@
-import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
+import greenfoot.*;
 
-/**
- * Write a description of class StartScreen here.
- * 
- * @author (your name) 
- * @version (a version number or a date)
- */
-public class StartScreen extends Actor
-{   
-    public void act() 
-    {   MouseInfo mouse = Greenfoot.getMouseInfo();
-            if(mouse != null){if (mouse.getButton() == 1 && mouse.getActor() == this){
+// The class used to display the background image and launch the game
+public class StartScreen extends Actor {
+    public void act() {
+        MouseInfo mouse = Greenfoot.getMouseInfo();
+        if (mouse != null) {
+            if (mouse.getButton() == 1 && mouse.getActor() == this) {
                 getWorld().removeObject(this);
-                }}
-    }    
+            }
+        }
+    }
 }

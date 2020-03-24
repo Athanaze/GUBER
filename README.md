@@ -1,9 +1,5 @@
 # TODO
-+ Improve timer mechanics
-+ Add animations for oldLadies?
-+ Replay button
-+ BUG : Sometimes you cannot drop off the client
-+ BUG : Fountain on top of the timer
+
 # Gameplay
 
 + Le joueur 1 conduit la voiture, et doit déposer ses covoiturés aux quatres points de la ville.
