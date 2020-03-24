@@ -67,14 +67,15 @@ public class MyWorld extends World {
     };
     private Actor player2_Ammo = new Actor() {
     };
+    static final int FONT_SIZE = 20;
     static final int CLOCK_X = 75;
-    static final int CLOCK_Y = 40;
+    static final int CLOCK_Y = 5;
 
     static final int CLIENT_SCORE_X = 240;
-    static final int CLIENT_SCORE_Y = 40;
+    static final int CLIENT_SCORE_Y = 5;
 
     static final int PLAYER2_AMMO_X = 370;
-    static final int PLAYER2_AMMO_Y = 40;
+    static final int PLAYER2_AMMO_Y = 5;
 
     static final boolean GAME_OVER_BOLD = true;
     static final boolean GAME_OVER_ITALIC = false;
@@ -123,7 +124,7 @@ public class MyWorld extends World {
     int buildingY;
     int destinationX;
     int destinationY;
-    boolean drawDisplay = true;
+    boolean drawDisplay = false;
 
     public MyWorld() {
         // Create a new world with X by Y cells with a cell size of S pixels.
@@ -202,7 +203,7 @@ public class MyWorld extends World {
 
     private void showStats(int[] scoreArr) {
         if (scoreArr[0] == -1 && scoreArr[1] == -1) {
-            statsActor.setImage(new GreenfootImage("No stats yet. Play some games to see interesting data !", 20,
+            statsActor.setImage(new GreenfootImage("No stats yet. Play some games to see interesting data !", FONT_SIZE,
                     greenfoot.Color.BLACK, greenfoot.Color.WHITE));
         } else {
             float totalGame = (float) (scoreArr[0] + scoreArr[1]);
@@ -216,7 +217,7 @@ public class MyWorld extends World {
             statsActor.setImage(new GreenfootImage(
                     "Player 1 won " + String.valueOf(percent_win_player_1) + " % of games \n Player 2 won "
                             + String.valueOf(percent_win_player_2) + " % of games",
-                    20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+                    FONT_SIZE, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
 
         }
         addObject(statsActor, STATS_X, STATS_Y);
@@ -235,25 +236,27 @@ public class MyWorld extends World {
 
     public void act() {
         // to play gameover sound for oldlady
-        removeObject(statsActor);
+        
         boolean gameOverLady = car.gameOverLady;
         if (drawDisplay) {
-            clock.setImage(new GreenfootImage("Time: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+            removeObject(statsActor);
+            clock.setImage(new GreenfootImage("Time: " + clockTime, FONT_SIZE, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
             clientScore.setImage(
-                    new GreenfootImage("Client score: " + clockTime, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+                    new GreenfootImage("Client score: " + clockTime, FONT_SIZE, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
 
             addObject(clock, CLOCK_X, CLOCK_Y);
 
             addObject(clientScore, CLIENT_SCORE_X, CLIENT_SCORE_Y);
 
             player2_Ammo.setImage(
-                    new GreenfootImage("Old lady: " + player2Ammo, 20, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
+                    new GreenfootImage("Old lady: " + player2Ammo, FONT_SIZE, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
 
             addObject(player2_Ammo, PLAYER2_AMMO_X, PLAYER2_AMMO_Y);
             drawDisplay = false;
         }
         if (getObjects(StartScreen.class).size() == 0) {
             // Player 1
+            drawDisplay = true;
             Position carPosition = car.getPosition();
             // makes P1 wins when he dropped every client;
             if (droppedOffClients == N_CLIENTS) {
