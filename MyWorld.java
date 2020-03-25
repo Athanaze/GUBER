@@ -126,6 +126,11 @@ public class MyWorld extends World {
     int destinationY;
     boolean drawDisplay = false;
 
+    // NPC CARS
+    private CarNpc[] npcCars = {new CarNpc(), new CarNpc(), new CarNpc(), new CarNpc()}; 
+    // The number of npc cars existing at once in the world
+    static final int N_CARS = 4;
+
     public MyWorld() {
         // Create a new world with X by Y cells with a cell size of S pixels.
         super(WORLD_X, WORLD_Y, WORLD_S);
@@ -175,6 +180,44 @@ public class MyWorld extends World {
 
         // Read and show the stats
         showStats(readStats());
+
+        placeNpcCars();
+    }
+
+    // Npc stuff
+
+    private void placeNpcCars(){
+        // We spawn the npc cars at the very first line, on vertical roads
+
+        int carCounter = 0;
+        for (int i = 4; i < N_TILE; i+=8) {
+            if(carCounter < N_CARS){
+                if(tiles[0][i] == TILE_TYPE_INTERSECTION){
+                    int x = (i*TILE_SIZE)+(TILE_SIZE / 2);
+                    int y = 0;
+                    addObject(npcCars[carCounter], x, y);
+                    npcCars[carCounter].startPosition.x = x;
+                    npcCars[carCounter].startPosition.y = y;
+
+                    npcCars[carCounter].setImageProperly(carCounter);
+                    carCounter++;
+                }
+            }
+
+        }
+        
+    }
+
+    // If one (or more) npc cars is in collision with player1's car, returns true (it's game over)
+    private boolean checkCollisionWithNpcCars(){
+        boolean r = false;
+        for(int i=0; i<N_CARS; i++){
+            if(npcCars[i].player1Collision){
+                r = true;
+                break;
+            }
+        }
+        return r;
     }
 
     // Statistic stuff
@@ -330,6 +373,15 @@ public class MyWorld extends World {
                 
                    
             }
+
+            // Check for collision with npc cars only if it is not already game over for another reason
+            if(!gameOver){
+                gameOver = checkCollisionWithNpcCars();
+                if(gameOver){
+                    gameOverType = GAME_OVER_TYPE_CRASH;
+                }
+            }
+
 
             // Player 2
             MouseInfo mouse = Greenfoot.getMouseInfo();
