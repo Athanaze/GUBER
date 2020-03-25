@@ -89,7 +89,7 @@ public class MyWorld extends World {
     static final int PLAYER2_MAX_AMMO = 5;
     int player2Ammo = 5;
     // should be the same as oldlady life duration
-    int player2Cooldown = OldLady.LIFE_DURATION;
+    
 
     private Actor statsActor = new Actor() {
     };
@@ -327,10 +327,8 @@ public class MyWorld extends World {
                     gameOver = true;
                     break;
 
-                case TILE_TYPE_OLD_LADY:
-
-                    gameOver = true;
-                    break;
+                
+                   
             }
 
             // Player 2
@@ -346,24 +344,19 @@ public class MyWorld extends World {
 
                         if (player2Ammo > 0) {
                             Greenfoot.playSound("old_lady_spawned.wav");
-                            addObject(new OldLady(tilePosition), tilePosition.x * TILE_SIZE,
-                                    tilePosition.y * TILE_SIZE);
+                            addObject(new OldLady(tilePosition), tilePosition.x * TILE_SIZE  + 10,
+                                    tilePosition.y * TILE_SIZE +10);
                             player2Ammo--;
                             tiles[tilePosition.x][tilePosition.y] = TILE_TYPE_OLD_LADY;
-                        }
+                      
                     }
 
                 }
 
             }
-            if (player2Ammo < PLAYER2_MAX_AMMO) {
-                if (player2Cooldown < 1) {
-                    player2Ammo++;
-                    player2Cooldown = OldLady.LIFE_DURATION;
-
-                }
-            }
-            player2Cooldown--;
+            
+            } 
+            
 
             // update clock
             runClock();

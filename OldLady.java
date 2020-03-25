@@ -18,11 +18,13 @@ public class OldLady extends Actor {
     public void act() {
         timer++;
         GreenfootImage image = getImage();
-        image.scale(TILE_SIZE, TILE_SIZE);
+        image.scale(17, TILE_SIZE -15);
         if (timer > LIFE_DURATION) {
             
             MyWorld myWorld = (MyWorld) getWorld();
             myWorld.setTileType(tile_p, TILE_TYPE_CROSSING);
+            if(myWorld.player2Ammo < 5){
+            myWorld.player2Ammo++;}
             image.clear();
             getWorld().removeObject(this);
         }

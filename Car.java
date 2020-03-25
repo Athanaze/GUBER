@@ -82,11 +82,14 @@ public class Car extends Actor {
         
         // update visual location (we updated the "logic" location earlier in this
         // method)
-        if (isTouching(OldLady.class)) {
+        MyWorld myWorld = (MyWorld) getWorld();
+        if (myWorld.getObjects(OldLady.class) != null) {
+                
+         if (isTouching(OldLady.class)) {
             gameOverLady =true;
             gameOver = true;
         }
-    }
+    }}
 
     // Check if the car is the world's limit
     private boolean isInWorldBoundaries(int v) {
