@@ -220,8 +220,11 @@ public class MyWorld extends World {
         }
         return r;
     }
-
+    /////////////////////////
     // Statistic stuff
+
+    // reads the stats from the file and returns the information in an array like so :
+    // [player1Score, player2Score]
     private int[] readStats() {
         int[] scoreArr = { -1, -1 };
         try {
@@ -245,6 +248,7 @@ public class MyWorld extends World {
         return scoreArr;
     }
 
+    // Show the stats as percent
     private void showStats(int[] scoreArr) {
         if (scoreArr[0] == -1 && scoreArr[1] == -1) {
             statsActor.setImage(new GreenfootImage("No stats yet. Play some games to see interesting data !", FONT_SIZE,
@@ -267,6 +271,7 @@ public class MyWorld extends World {
         addObject(statsActor, STATS_X, STATS_Y);
     }
 
+    // Used at the end of the game, to add the win in the stats
     private void writeNewScores(int[] scoreArr) {
         try {
             FileWriter myWriter = new FileWriter(STATS_FILE);
@@ -425,6 +430,8 @@ public class MyWorld extends World {
             }
             if (playGameOver) {
                 int[] rStats = readStats();
+                
+                // Play a different sound depending of the situation (is it a crash ? , did player 1 won ?, etc...)
                 switch (gameOverType) {
                     case GAME_OVER_TYPE_CRASH:
                         GreenfootSound crash = new GreenfootSound("crash.wav");
@@ -490,8 +497,6 @@ public class MyWorld extends World {
                         writeNewScores(rStats);
                         break;
                 }
-
-                // give time for the sound to play
 
             }
             // If the car is next to a client, get the client in the car
@@ -617,7 +622,7 @@ public class MyWorld extends World {
 
     // Returns the tile position in the global array from the x and y pixel
     // coordinates
-    private Position getTilePosition(int x, int y) {
+    public Position getTilePosition(int x, int y) {
         return new Position(getOneTilePosition(x), getOneTilePosition(y));
     }
 
@@ -649,7 +654,7 @@ public class MyWorld extends World {
 
         }
     }
-
+    // Here we choose the type of building to place
     private void placeBuildings(int n) {
         
         while (n >= 0) {
@@ -678,9 +683,6 @@ public class MyWorld extends World {
                         } else {
                             drawBuilding2(x, y);
                         }
-
-                    
-
                 }
 
                 n--;
@@ -690,6 +692,7 @@ public class MyWorld extends World {
 
     }
 
+    // Just a wrapper function
     private void removeAllObjects() {
         removeObjects(getObjects(null));
     }
@@ -745,6 +748,7 @@ public class MyWorld extends World {
         image.fillRect(x, y + (TILE_SIZE / ROAD_TO_GRASS_RATIO), TILE_SIZE, TILE_SIZE / (ROAD_TO_GRASS_RATIO / 2));
     }
 
+    // Draw the intersection of the roads
     private void drawIntersection(int i, int j) {
         int x = i * TILE_SIZE;
         int y = j * TILE_SIZE;
@@ -762,6 +766,7 @@ public class MyWorld extends World {
         image.fillRect(x + (TILE_SIZE / ROAD_TO_GRASS_RATIO), y, TILE_SIZE / (ROAD_TO_GRASS_RATIO / 2), TILE_SIZE);
     }
 
+    // simple orange buildings
     private void drawBuilding(int i, int j) {
         int x = i * TILE_SIZE;
         int y = j * TILE_SIZE;
@@ -773,6 +778,7 @@ public class MyWorld extends World {
         image.fillRect(x, y, TILE_SIZE, TILE_SIZE);
     }
 
+    // More elaborate buildings with colored borders
     private void drawBuilding2(int i, int j) {
         // First, draw the light square, then the dark one inside it
         int x = i * TILE_SIZE;
@@ -790,7 +796,7 @@ public class MyWorld extends World {
                 TILE_SIZE - (2 * BUILDING_BORDER_SIZE));
     }
 
-    // A fountain is also a "building", it's just a different representation of the
+    // A fountain (or a tree, helicopad, etc...) is also a "building", it's just a different representation of the
     // same concept (another view of the same model)
     private void drawFountain(int i, int j) {
         Building_image fountain = new Building_image();
@@ -837,7 +843,6 @@ public class MyWorld extends World {
 
         GreenfootImage image = getBackground();
         image.setColor(TILE_ROAD_COLOR);
-        // image.fillRect(x, y, TILE_SIZE, TILE_SIZE);
 
         // Add bands on top
         image.setColor(TILE_CROSSING_COLOR);
@@ -920,9 +925,6 @@ public class MyWorld extends World {
                     break;
                 }
             }
-            // clients[i].setLocation(tileX*TILE_SIZE + (TILE_SIZE/2), tileY*TILE_SIZE +
-            // (TILE_SIZE/2));
-
         }
     }
 

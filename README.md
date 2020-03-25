@@ -1,5 +1,5 @@
 # TODO
-
++ Fix Npc car collision... 79% of the time it works...
 # Gameplay
 
 + Le joueur 1 conduit la voiture, et doit déposer ses covoiturés aux quatres points de la ville.
@@ -8,7 +8,7 @@
 ## Conditions de victoires du joueur 1
 
 + Il arrive à livrer les 5 covoiturés dans le temps imparti
-+ Il n'entre pas en collision avec une vieille ou avec les batiments.
++ Il n'entre pas en collision ni avec une vieille, ni avec les batiments, ni avec les autres voitures.
 
 ## Conditions de victoires du joueur 2
 
@@ -16,12 +16,15 @@
 
 # Fonctionnement du jeu
 
+# Création du monde aléatoire
++ Les emplacement des passages piétons sont choisis aléatoirement.
++ Le type de batiment (immeuble, fontaine, héliport ou parc) est choisi aléatoirement
++ Les voitures "Non Player Character" accélèrent aléatoirement
+
 ## Gestion des clients et de leurs destinations
 + 4 clients total, une couleur par client (rouge : 0, bleu : 1, vert : 2, rose : 3)
 + Chaque destination est colorée de la couleur du client correspondant.
 + Les destinations des passagers sont déterminés au début de la partie.
-
-+ Passages piétons sont générés aléatoirement.
 
 # Contrôles
 

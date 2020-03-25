@@ -32,7 +32,7 @@ public class Car extends Actor {
         if (delay < timer) {
             move = true;
         }
-
+        // Listening for arrow keys input, and move the car accordingly
         if (isInWorldBoundaries(x - 1)) {
             if (Greenfoot.isKeyDown("left")) {
                 if (move) {

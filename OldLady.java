@@ -11,20 +11,24 @@ public class OldLady extends Actor {
     int timer = 0;
     Position tile_p;
 
-    public OldLady(Position p){
+    public OldLady(Position p) {
         tile_p = p;
 
     }
+
     public void act() {
         timer++;
         GreenfootImage image = getImage();
-        image.scale(17, TILE_SIZE -15);
+        image.scale(17, TILE_SIZE - 15);
+        
         if (timer > LIFE_DURATION) {
+            // Remove the old lady
             
             MyWorld myWorld = (MyWorld) getWorld();
             myWorld.setTileType(tile_p, TILE_TYPE_CROSSING);
-            if(myWorld.player2Ammo < 5){
-            myWorld.player2Ammo++;}
+            if (myWorld.player2Ammo < 5) {
+                myWorld.player2Ammo++;
+            }
             image.clear();
             getWorld().removeObject(this);
         }
