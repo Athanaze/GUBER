@@ -85,7 +85,7 @@ public class Car extends Actor {
         MyWorld myWorld = (MyWorld) getWorld();
         if (myWorld.getObjects(OldLady.class) != null) {
                 
-         if (isTouching(OldLady.class)) {
+         if (isTouching(OldLady.class) && myWorld.gameOverType == myWorld.GAME_OVER_TYPE_KILLED_OLD_LADY) {
             gameOverLady =true;
             gameOver = true;
         }
