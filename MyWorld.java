@@ -161,6 +161,7 @@ public class MyWorld extends World {
 
         }
         placeBuildings(NB_BUILDINGS);
+        placeDestinations();
         // Place some crossings on the roads
         placeCrossings(NB_CROSSINGS);
         placeClients();
@@ -650,24 +651,14 @@ public class MyWorld extends World {
     }
 
     private void placeBuildings(int n) {
-        int clientDestinationCounter = 0;
+        
         while (n >= 0) {
             int x = Greenfoot.getRandomNumber(N_TILE - 1);
             int y = Greenfoot.getRandomNumber(N_TILE - 1);
-
+                
             if ((tiles[x][y] == TILE_TYPE_GRASS)) {
 
-                // The first 4 buildings are set as destination
-                if ((n < N_CLIENTS) && (tiles[x - 1][y] != TILE_TYPE_GRASS || tiles[x + 1][y] != TILE_TYPE_GRASS
-                        || tiles[x][y + 1] != TILE_TYPE_GRASS || tiles[x][y - 1] != TILE_TYPE_GRASS
-                        || tiles[x + 1][y] != TILE_TYPE_BUILDING || tiles[x - 1][y] != TILE_TYPE_BUILDING
-                        || tiles[x][y + 1] != TILE_TYPE_BUILDING || tiles[x][y - 1] != TILE_TYPE_BUILDING)) {
-                    tiles[x][y] = TILE_TYPE_CLIENT_DESTINATIONS[n];
-
-                    drawDestination(x, y, n);
-
-                } else {
-                    tiles[x][y] = TILE_TYPE_BUILDING;
+                tiles[x][y] = TILE_TYPE_BUILDING;
                     if (n % 2 == 0) {
                         drawBuilding(x, y);
                     } else {
@@ -688,7 +679,7 @@ public class MyWorld extends World {
                             drawBuilding2(x, y);
                         }
 
-                    }
+                    
 
                 }
 
@@ -897,7 +888,22 @@ public class MyWorld extends World {
 
         }
     }
+    private void placeDestinations() {
+        for (int i = 0; i < N_CLIENTS; i++) {
+            while (true) {
+                int x = Greenfoot.getRandomNumber(N_TILE - 1);
+                int y = Greenfoot.getRandomNumber(N_TILE - 1);
+                // check if its a building not next to a crossing
+                if (tiles[x][y] != TILE_TYPE_VERTICAL && tiles[x][y] != TILE_TYPE_HORIZONTAL
+                        && tiles[x][y] != TILE_TYPE_INTERSECTION
+                        && (checkTile(x - 1, y) || checkTile(x + 1, y) || checkTile(x, y + 1) || checkTile(x, y - 1))) {
+                    tiles[x][y] = TILE_TYPE_CLIENT_DESTINATIONS[i];
 
+                    drawDestination(x, y, i);
+                    break;
+                }
+            }}
+        }
     private void placeClients() {
         for (int i = 0; i < 4; i++) {
             while (true) {
