@@ -1,14 +1,15 @@
-# TODO
-+ Fix Npc car collision... 79% of the time it works...
 # Gameplay
 
 + Le joueur 1 conduit la voiture, et doit déposer ses covoiturés aux quatres points de la ville.
-+ Le joueur 2 s'acharne de le ralentir, au moyen de Vieilles qui sont invoquées.
++ Le joueur 2 s'acharne à le ralentir, au moyen de Vieilles qui sont invoquées en cliquant sur les passages piétons.
++ Au maximum 5 Vieilles peuvent être dans le monde en même temps.
++ Les vieilles disparaissent au bon d'un certain temps. Quand une Vieille disparait, le "compteur de Vieilles" est incrémenté.
++ Un compte à rebours de 60 sec est lancé au début de la partie.
 
 ## Conditions de victoires du joueur 1
 
 + Il arrive à livrer les 5 covoiturés dans le temps imparti
-+ Il n'entre pas en collision ni avec une vieille, ni avec les batiments, ni avec les autres voitures.
++ Il n'entre pas en collision ni avec une Vieille, ni avec les batiments (ou arbre, fontaine, hélipad...), ni avec les autres voitures.
 
 ## Conditions de victoires du joueur 2
 
@@ -24,7 +25,7 @@
 ## Gestion des clients et de leurs destinations
 + 4 clients total, une couleur par client (rouge : 0, bleu : 1, vert : 2, rose : 3)
 + Chaque destination est colorée de la couleur du client correspondant.
-+ Les destinations des passagers sont déterminés au début de la partie.
++ Les destinations des passagers sont déterminées au début de la partie.
 
 # Contrôles
 
