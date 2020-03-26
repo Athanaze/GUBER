@@ -160,11 +160,12 @@ public class MyWorld extends World {
             }
 
         }
+        placeClients();
         placeBuildings(NB_BUILDINGS);
         placeDestinations();
         // Place some crossings on the roads
         placeCrossings(NB_CROSSINGS);
-        placeClients();
+        
 
         car = new Car();
 
