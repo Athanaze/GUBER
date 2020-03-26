@@ -26,7 +26,7 @@ public class Client extends Actor {
         List cars = getWorld().getObjects(Car.class);
         int positionx = getX();
         int positiony = getY();
-
+        //movement to get in the car
         if (moveup) {
             if (!cars.isEmpty()) {
                 Actor Car = (Actor) cars.get(0);
@@ -65,9 +65,11 @@ public class Client extends Actor {
                 setImage(image);
             }
         }
+        //movement once he gets out of the car
         if (dropped) {
             int destinationX = ((MyWorld) getWorld()).destinationX;
             int destinationY = ((MyWorld) getWorld()).destinationY;
+            //check if he's at destination
             if (positionx == destinationX && positiony == destinationY) {
                 image.clear();
                 setImage(image);
@@ -92,6 +94,8 @@ public class Client extends Actor {
 
     public void getInTheCar() {
         Greenfoot.playSound("hop.wav");
+        //gets the car position to know in which direction to go
+     
         List cars = getWorld().getObjects(Car.class);
         if (!cars.isEmpty()) {
             Actor Car = (Actor) cars.get(0);
@@ -111,7 +115,8 @@ public class Client extends Actor {
 
     // Called when the car is at the right destination
     public void dropOff(int tileX, int tileY) {
-        Greenfoot.playSound("success.wav");
+        if(((MyWorld) getWorld()).droppedOffClients < 3){
+        Greenfoot.playSound("success.wav");}
         setColor(color);
         List cars = getWorld().getObjects(Car.class);
 

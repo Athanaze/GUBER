@@ -31,7 +31,7 @@ public class MyWorld extends World {
     static final int N_CROSSING_BANDS = 4;
     static final int CROSSING_BANDS_WIDTH = TILE_SIZE / (N_CROSSING_BANDS * 2);
     static final int NB_BUILDINGS = 500;
-    static final int NB_CROSSINGS = 10;
+    static final int NB_CROSSINGS = 20;
     static final int BUILDING_IMAGE_OFFSET = 10;
 
     static final int TILE_TYPE_BUILDING = 0;
@@ -182,7 +182,7 @@ public class MyWorld extends World {
         // Read and show the stats
         showStats(readStats());
 
-        placeNpcCars();
+        
     }
 
     // Npc stuff
@@ -287,7 +287,9 @@ public class MyWorld extends World {
         // to play gameover sound for oldlady
         
         boolean gameOverLady = car.gameOverLady;
+       
         if (drawDisplay) {
+            placeNpcCars();
             removeObject(statsActor);
             clock.setImage(new GreenfootImage("Time: " + clockTime, FONT_SIZE, greenfoot.Color.BLACK, greenfoot.Color.WHITE));
             clientScore.setImage(
@@ -308,11 +310,7 @@ public class MyWorld extends World {
             drawDisplay = true;
             Position carPosition = car.getPosition();
             // makes P1 wins when he dropped every client;
-            if (droppedOffClients == N_CLIENTS) {
-                gameOverType = GAME_OVER_TYPE_PLAYER_1_WON;
-                gameOver = true;
-
-            }
+            
             // Value is -1 if the car is not next to a client, and if it is, the value is
             // the client's number
             int carNextToClient = -1;
@@ -379,7 +377,11 @@ public class MyWorld extends World {
                 
                    
             }
+            if (droppedOffClients == N_CLIENTS) {
+                gameOverType = GAME_OVER_TYPE_PLAYER_1_WON;
+                gameOver = true;
 
+            }
             // Check for collision with npc cars only if it is not already game over for another reason
             if(!gameOver){
                 gameOver = checkCollisionWithNpcCars();
@@ -511,6 +513,7 @@ public class MyWorld extends World {
             if (dropOffClient) {
                 buildingX = Greenfoot.getRandomNumber(N_TILE - 1);
                 buildingY = Greenfoot.getRandomNumber(N_TILE - 1);
+                // used in the class CLient, to know in which direction the building is
                 while (tiles[buildingX][buildingY] != TILE_TYPE_CLIENT_DESTINATIONS[clientInTheCar]) {
                     buildingX = Greenfoot.getRandomNumber(N_TILE - 1);
                     buildingY = Greenfoot.getRandomNumber(N_TILE - 1);
@@ -898,12 +901,13 @@ public class MyWorld extends World {
             while (true) {
                 int x = Greenfoot.getRandomNumber(N_TILE - 1);
                 int y = Greenfoot.getRandomNumber(N_TILE - 1);
-                // check if its a building not next to a crossing
-                if (tiles[x][y] != TILE_TYPE_VERTICAL && tiles[x][y] != TILE_TYPE_HORIZONTAL
-                        && tiles[x][y] != TILE_TYPE_INTERSECTION
+                // check if its a building not next to a crossing, not in an unreachable area
+                if (tiles[x][y] == TILE_TYPE_GRASS && tiles[x][y] != TILE_TYPE_VERTICAL && tiles[x][y] != TILE_TYPE_HORIZONTAL
+                        && tiles[x][y] != TILE_TYPE_INTERSECTION && tiles[x][y] != TILE_TYPE_CLIENT_0 && tiles[x][y] != TILE_TYPE_CLIENT_0
+                        && tiles[x][y] != TILE_TYPE_CLIENT_1 && tiles[x][y] != TILE_TYPE_CLIENT_2 && tiles[x][y] != TILE_TYPE_CLIENT_3
                         && (checkTile(x - 1, y) || checkTile(x + 1, y) || checkTile(x, y + 1) || checkTile(x, y - 1))) {
                     tiles[x][y] = TILE_TYPE_CLIENT_DESTINATIONS[i];
-
+                    //then draws it
                     drawDestination(x, y, i);
                     break;
                 }
@@ -914,7 +918,7 @@ public class MyWorld extends World {
             while (true) {
                 int x = Greenfoot.getRandomNumber(N_TILE - 1);
                 int y = Greenfoot.getRandomNumber(N_TILE - 1);
-                // check if its a building not next to a crossing
+                // check if its a building not next to a crossing, not in an unreachable area
                 if (tiles[x][y] != TILE_TYPE_VERTICAL && tiles[x][y] != TILE_TYPE_HORIZONTAL
                         && tiles[x][y] != TILE_TYPE_INTERSECTION
                         && (checkTile(x - 1, y) || checkTile(x + 1, y) || checkTile(x, y + 1) || checkTile(x, y - 1))) {
@@ -934,8 +938,8 @@ public class MyWorld extends World {
         if (x <= 0 || y <= 0) {
             r = false;
         } else {
-            r = (tiles[x][y] == TILE_TYPE_HORIZONTAL || tiles[x][y] == TILE_TYPE_VERTICAL
-                    || tiles[x][y] == TILE_TYPE_CROSSING);
+            r = (tiles[x][y] == TILE_TYPE_HORIZONTAL || tiles[x][y] == TILE_TYPE_VERTICAL)
+                    ;
         }
         return r;
     }
